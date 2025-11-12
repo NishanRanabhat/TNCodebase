@@ -1,0 +1,6 @@
+{
+  "system": {"type": "spin","N": 20,"description":"test description"},
+  "model": {"name": "transverse_field_ising","params": {"N": 20,"J": -1.0,"h": 0.5,"coupling_dir": "Z","field_dir": "X"}},
+  "state": {"type": "random","params":{"bond_dim":5}},
+  "algorithm": {"type": "dmrg","solver": {"type": "lanczos","krylov_dim": 4,"max_iter": 14},"options": {"chi_max": 100,"cutoff": 1e-8,"local_dim": 2},"run": {"n_sweeps": 50}}
+}

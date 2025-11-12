@@ -1,0 +1,4 @@
+{
+  "model": {"name": "transverse_field_ising","params": {"N": 10, "J": -1.0,"h": 0.5,"coupling_dir": "Z","field_dir": "X","dtype": "Float64"}}
+}
+

@@ -1,0 +1,4 @@
+{
+    "system": {"type": "spinboson", "N_spins": 12, "nmax": 20},
+    "state": {"type": "random","params": {"bond_dim": 8}}
+}

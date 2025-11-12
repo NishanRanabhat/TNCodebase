@@ -1,0 +1,4 @@
+{
+  "system": {"type": "spin","N": 10,"S": 0.5},
+  "state": {"type": "prebuilt","name": "neel","params": {"spin_direction": "Z","even_state": 1,"odd_state":2}}
+}

@@ -1,0 +1,4 @@
+{
+  "system": {"type": "spin","N": 10,"S": 0.5},
+  "state": {"type": "prebuilt","name": "kink","params": {"spin_direction": "Z","position": 4,"left_state":1,"right_state":2}}
+}

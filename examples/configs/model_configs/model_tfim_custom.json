@@ -1,0 +1,24 @@
+{
+  "model": {
+    "name": "custom_spin",
+    "params": {
+      "N": 10,
+      "d": 2,
+      "dtype": "ComplexF64",
+      "channels": [
+        {
+          "type": "FiniteRangeCoupling",
+          "op1": "Z",
+          "op2": "Z",
+          "range": 1,
+          "strength": -1.0
+        },
+        {
+          "type": "Field",
+          "op": "X",
+          "strength": 0.5
+        }
+      ]
+    }
+  }
+}
