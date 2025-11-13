@@ -1,0 +1,17 @@
+{
+    "simulation": {
+      "config_file": "configs/sim_tdvp.json"
+    },
+    
+    "observable": {
+      "type": "single_site_expectation",
+      "params": {
+        "operator": "Sz",
+        "site": 10
+      }
+    },
+    
+    "sweeps": {
+      "selection": "all"
+    }
+  }
