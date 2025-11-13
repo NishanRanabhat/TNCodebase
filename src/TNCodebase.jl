@@ -23,6 +23,12 @@ include(joinpath(@__DIR__, "Database", "database_utils.jl"))
 
 include(joinpath(@__DIR__, "Analysis", "contractions.jl"))
 include(joinpath(@__DIR__, "Analysis", "core.jl"))
+include(joinpath(@__DIR__, "Analysis", "correlations.jl"))
+include(joinpath(@__DIR__, "Analysis", "entanglement.jl"))
+include(joinpath(@__DIR__, "Analysis", "energy.jl"))
+
+
+
 
 
 
@@ -38,6 +44,8 @@ export MPS, MPO, Environment, DMRGOptions, TDVPOptions,
         truncation_error, LanczosSolver, KrylovExponential, solve, evolve, 
         OneSiteEffectiveHamiltonian, TwoSiteEffectiveHamiltonian, ZeroSiteEffectiveHamiltonian,
         dmrg_sweep, tdvp_sweep, run_simulation_from_config, setup_run_directory, save_mps_sweep,finalize_run, get_latest_run_for_config,
-        load_mps_sweep, load_mps_at_time, contract_right, contract_left, inner_product, single_site_expectation, subsystem_expectation_sum
+        load_mps_sweep, load_mps_at_time, contract_right, contract_left, inner_product, single_site_expectation, subsystem_expectation_sum,
+        two_site_expectation, correlation_function, connected_correlation, entanglement_entropy, entanglement_spectrum, energy_expectation,
+        energy_variance
 
 end
