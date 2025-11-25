@@ -1,5 +1,3 @@
-export product_state, random_state
-
 """
     product_state_mps(sites, labels)
 
@@ -10,7 +8,7 @@ Build a bond-dim-1 MPS by looping over `sites[i]` and calling
 function product_state(sites::Vector{<:AbstractSite}, labels::Vector)
     N = length(sites)
     @assert length(labels)==N
-    Ts = [state_tensor(sites[i], labels[i]) for i in 1:N]
+    Ts = [_state_tensor(sites[i], labels[i]) for i in 1:N]
     return MPS{eltype(Ts[1])}(Ts)
 end
 

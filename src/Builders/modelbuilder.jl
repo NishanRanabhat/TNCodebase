@@ -8,7 +8,7 @@
 """
 Transverse Field Ising Model: H = J Σᵢ σᶻᵢσᶻᵢ₊₁ + h Σᵢ σˣᵢ
 """
-function get_tfim_channels(N, J, h, coupling_dir, field_dir)
+function _get_tfim_channels(N, J, h, coupling_dir, field_dir)
     return [
         FiniteRangeCoupling(coupling_dir, coupling_dir, 1, J),
         Field(field_dir, h)
@@ -18,7 +18,7 @@ end
 """
 Heisenberg Chain: H = Jx Σᵢ σˣᵢσˣᵢ₊₁ + Jy Σᵢ σʸᵢσʸᵢ₊₁ + Jz Σᵢ σᶻᵢσᶻᵢ₊₁ + h Σᵢ σᶻᵢ
 """
-function get_heisenberg_channels(N, Jx, Jy, Jz, h, field_dir)
+function _get_heisenberg_channels(N, Jx, Jy, Jz, h, field_dir)
     return [
         FiniteRangeCoupling(:X, :X, 1, Jx),
         FiniteRangeCoupling(:Y, :Y, 1, Jy),
@@ -30,7 +30,7 @@ end
 """
 Long-Range Ising: H = J Σᵢ<ⱼ σᶻᵢσᶻⱼ/|i-j|^α + h Σᵢ σˣᵢ
 """
-function get_longrange_ising_channels(N, J, alpha, n_exp, h, coupling_dir, field_dir)
+function _get_longrange_ising_channels(N, J, alpha, n_exp, h, coupling_dir, field_dir)
     return [
         PowerLawCoupling(coupling_dir, coupling_dir, J, alpha, n_exp, N),
         Field(field_dir, h)
@@ -40,7 +40,7 @@ end
 """
 Spin-Boson Model: H = ω b†b + J Σᵢ<ⱼ σᶻᵢσᶻⱼ/|i-j|^α + h Σᵢ σᶻᵢ + g(b+b†)Σᵢ σˣᵢ
 """
-function get_spinboson_channels(N_spins, J, alpha, n_exp, h, omega, g,
+function _get_spinboson_channels(N_spins, J, alpha, n_exp, h, omega, g,
                                 spin_coupling_dir, spin_field_dir, boson_coupling_dir)
     # Spin-spin interactions
     spinchannel1 = [
@@ -68,7 +68,7 @@ end
 """
 Parse spin-only channels from config
 """
-function parse_spin_channels(channels_config)
+function _parse_spin_channels(channels_config)
     channels = Spin[]
     
     for ch in channels_config
@@ -115,13 +115,13 @@ end
 """
 Parse spin-boson channels from config
 """
-function parse_spinboson_channels(channels_config)
+function _parse_spinboson_channels(channels_config)
     channels = Boson[]
     
     for ch in channels_config
         if ch["type"] == "SpinBosonInteraction"
             # Recursively parse spin sub-channels
-            spin_subchannels = parse_spin_channels(ch["spin_channels"])
+            spin_subchannels = _parse_spin_channels(ch["spin_channels"])
             
             push!(channels, SpinBosonInteraction(
                 spin_subchannels,
@@ -147,7 +147,7 @@ end
 # PART 3: Helper Functions
 # ============================================================================
 
-function parse_dtype(dtype_str)
+function _parse_dtype(dtype_str)
     if dtype_str == "Float64"
         return Float64
     elseif dtype_str == "ComplexF64"
@@ -169,7 +169,7 @@ Works for both pre-built and custom models.
 """
 function build_mpo_from_config(config)
     # Get channels and system parameters
-    channels, system_params = get_channels_from_config(config)
+    channels, system_params = _get_channels_from_config(config)
     
     # Build FSM (unified for all models)
     fsm = build_FSM(channels)
@@ -189,13 +189,13 @@ end
 Extract channels from config (either from pre-built template or custom specification).
 Returns (channels, system_params).
 """
-function get_channels_from_config(config)
+function _get_channels_from_config(config)
     name = config["model"]["name"]
     params = config["model"]["params"]
     
     # Parse dtype (common to all)
     dtype = if haskey(params, "dtype")
-        parse_dtype(params["dtype"])
+        _parse_dtype(params["dtype"])
     else
         ComplexF64
     end
@@ -205,7 +205,7 @@ function get_channels_from_config(config)
     # ────────────────────────────────────────────────────────────────────────
     
     if name == "transverse_field_ising"
-        channels = get_tfim_channels(
+        channels = _get_tfim_channels(
             params["N"],
             params["J"],
             params["h"],
@@ -215,7 +215,7 @@ function get_channels_from_config(config)
         system = (type="spin", N=params["N"], dtype=dtype)
         
     elseif name == "heisenberg"
-        channels = get_heisenberg_channels(
+        channels = _get_heisenberg_channels(
             params["N"],
             params["Jx"],
             params["Jy"],
@@ -226,7 +226,7 @@ function get_channels_from_config(config)
         system = (type="spin", N=params["N"], dtype=dtype)
         
     elseif name == "long_range_ising"
-        channels = get_longrange_ising_channels(
+        channels = _get_longrange_ising_channels(
             params["N"],
             params["J"],
             params["alpha"],
@@ -238,7 +238,7 @@ function get_channels_from_config(config)
         system = (type="spin", N=params["N"], dtype=dtype)
         
     elseif name == "spin_boson"
-        channels = get_spinboson_channels(
+        channels = _get_spinboson_channels(
             params["N_spins"],
             params["J"],
             params["alpha"],
@@ -258,11 +258,11 @@ function get_channels_from_config(config)
     # ────────────────────────────────────────────────────────────────────────
     
     elseif name == "custom_spin"
-        channels = parse_spin_channels(params["channels"])
+        channels = _parse_spin_channels(params["channels"])
         system = (type="spin", N=params["N"], dtype=dtype)
         
     elseif name == "custom_spinboson"
-        channels = parse_spinboson_channels(params["channels"])
+        channels = _parse_spinboson_channels(params["channels"])
         system = (type="spinboson", N=params["N_spins"]+1, 
                  nmax=params["nmax"], dtype=dtype)
         
