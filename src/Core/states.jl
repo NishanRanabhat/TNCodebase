@@ -2,8 +2,6 @@
 using LinearAlgebra
 using TensorOperations
 
-export MPSState
-
 # ============= State Types =============
 """
     MPSState{T}
@@ -69,10 +67,10 @@ function MPSState(mps::MPS{Tmps}, mpo::MPO{Tmpo}; center=1) where {Tmps,Tmpo}
     Tenv = promote_type(Tmps, Tmpo)
     
     # NO CONVERSIONS OR COPIES! Just use the inputs directly
-    canonicalize(mps, center)  # Modifies in-place
+    make_canonical(mps, center)  # Modifies in-place
     
     # Build environment with natural type promotion
-    env = build_environment(mps, mpo, center)
+    env = _build_environment(mps, mpo, center)
     
     return MPSState{Tmps,Tmpo,Tenv}(mps, mpo, env, center)
 end

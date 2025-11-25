@@ -1,9 +1,5 @@
 using LinearAlgebra
 
-export FiniteRangeCoupling,ExpChannelCoupling,PowerLawCoupling,Field,
-        BosonOnly,SpinBosonInteraction,build_path,SpinFSMPath,SpinBosonFSMPath,
-        build_FSM
-
 # ──────────────────────────────────────────────────────────────────────────────
 # 1) Abstract hierarchy
 # ──────────────────────────────────────────────────────────────────────────────
@@ -113,7 +109,7 @@ end
 # ──────────────────────────────────────────────────────────────────────────────
 
 # for finite‐range couplings
-function build_path(ns::Int, coupling::FiniteRangeCoupling,
+function _build_path(ns::Int, coupling::FiniteRangeCoupling,
     transitions::Vector{Tuple{Int64, Int64, Symbol, Float64}})
     path = ns+1 : ns+coupling.dx
     # idle → first state : emit op1
@@ -128,7 +124,7 @@ function build_path(ns::Int, coupling::FiniteRangeCoupling,
 end
 
 # for exponential couplings
-function build_path(ns::Int, coupling::ExpChannelCoupling,
+function _build_path(ns::Int, coupling::ExpChannelCoupling,
     transitions::Vector{Tuple{Int64, Int64, Symbol, Float64}})
     path = ns + 1
     # idle → first state : emit op1
@@ -141,7 +137,7 @@ function build_path(ns::Int, coupling::ExpChannelCoupling,
     return path, transitions
 end
 
-function build_path(ns::Int,coupling::PowerLawCoupling,
+function _build_path(ns::Int,coupling::PowerLawCoupling,
     transitions::Vector{Tuple{Int64, Int64, Symbol, Float64}})
 
     nu, lambda = _power_law_to_exp(coupling.alpha,coupling.bondH,coupling.N)
@@ -156,7 +152,7 @@ function build_path(ns::Int,coupling::PowerLawCoupling,
 end
 
 # for single‐site fields
-function build_path(ns::Int, coupling::Field,
+function _build_path(ns::Int, coupling::Field,
     transitions::Vector{Tuple{Int64, Int64, Symbol, Float64}})
     # first idle → last : emit op
     push!(transitions, (0, 1, coupling.op, coupling.weight))
@@ -164,7 +160,7 @@ function build_path(ns::Int, coupling::Field,
 end
 
 #for boson only field
-function build_path(ns::Int,coupling::BosonOnly,transitions::Vector{Tuple{Int64, Int64, Symbol, Float64}})
+function _build_path(ns::Int,coupling::BosonOnly,transitions::Vector{Tuple{Int64, Int64, Symbol, Float64}})
     push!(transitions,(0,1,coupling.op,coupling.weight))
     return ns,transitions
 end
@@ -256,7 +252,7 @@ function build_FSM(channels::Vector{<:Spin};ns=1) #ns=1 default value for a fres
     push!(transitions, (0,0,:I,1.0))
 
     for ch in channels
-        ns, transitions = build_path(ns, ch, transitions)
+        ns, transitions = _build_path(ns, ch, transitions)
     end
 
     final = ns + 1
@@ -281,7 +277,7 @@ function build_FSM(channels::Vector{<:Boson};ns=1) #ns=1 default value for a fre
             transitions  = vcat(transitions,spin_transitions)
             push!(transitions,(0,ns,ch.boson_op,ch.weight_boson))
         elseif ch isa BosonOnly
-            ns,transitions = build_path(ns,ch,transitions)
+            ns,transitions = _build_path(ns,ch,transitions)
         end
     end 
 

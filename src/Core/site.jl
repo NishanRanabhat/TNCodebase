@@ -1,7 +1,5 @@
 using LinearAlgebra 
 
-export spin_ops, boson_ops, BosonSite, SpinSite, state_tensor
-
 function spin_ops(d::Integer)
     @assert d ≥ 1 "d must be ≥ 1"
     # total spin S and its m‐values
@@ -115,7 +113,7 @@ end
 Return the (1,d,1) tensor for boson‐level `n` (0 ≤ n ≤ nmax).
 """
 
-function state_tensor(site::BosonSite{T}, n::Int) where T
+function _state_tensor(site::BosonSite{T}, n::Int) where T
     @assert 0 ≤ n ≤ site.dim-1 "Boson level out of range"
     return reshape(site.eigvecs[:, n+1], 1, site.dim, 1)
 end
@@ -126,7 +124,7 @@ end
 Return the (1,d,1) tensor for the `k`th eigenvector (ascending) of `axis`.
 """
 
-function state_tensor(site::SpinSite{T}, label::Tuple{Symbol,Int}) where T
+function _state_tensor(site::SpinSite{T}, label::Tuple{Symbol,Int}) where T
     ax, k = label
     vals, vecs = site.spectra[ax]
     @assert 1 ≤ k ≤ length(vals)
