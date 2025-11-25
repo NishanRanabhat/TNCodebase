@@ -2,8 +2,6 @@
 using LinearAlgebra
 using TensorOperations
 
-export LanczosSolver, KrylovExponential, solve, evolve, OneSiteEffectiveHamiltonian, TwoSiteEffectiveHamiltonian, ZeroSiteEffectiveHamiltonian
-
 # ============= Effective Hamiltonian Types =============
 
 # Abstract supertype
@@ -28,9 +26,9 @@ struct ZeroSiteEffectiveHamiltonian <: EffectiveHamiltonian
     right_env::Array{<:Any,3}
 end
 
-# ============= Apply Methods (Hamiltonian-Vector Products) =============
+# ============= _apply Methods (Hamiltonian-Vector Products) =============
 
-function apply(H::OneSiteEffectiveHamiltonian, v::Vector)
+function _apply(H::OneSiteEffectiveHamiltonian, v::Vector)
     chi_l = size(H.left_env, 3)
     chi_r = size(H.right_env, 3)
     d = size(H.mpo_tensor, 4)  # Extract dimension from MPO
@@ -47,7 +45,7 @@ function apply(H::OneSiteEffectiveHamiltonian, v::Vector)
     return vec(M_new)
 end
 
-function apply(H::TwoSiteEffectiveHamiltonian, v::Vector)
+function _apply(H::TwoSiteEffectiveHamiltonian, v::Vector)
     chi_l = size(H.left_env, 3)
     chi_r = size(H.right_env, 3)
     d1 = size(H.mpo_tensor1, 4)
@@ -65,7 +63,7 @@ function apply(H::TwoSiteEffectiveHamiltonian, v::Vector)
     return vec(Psi2_new)
 end
 
-function apply(H::ZeroSiteEffectiveHamiltonian, v::Vector)
+function _apply(H::ZeroSiteEffectiveHamiltonian, v::Vector)
     chi_l = size(H.left_env, 3)
     chi_r = size(H.right_env, 3)
     
@@ -115,7 +113,7 @@ end
 
 #Find the lowest eigenvalue and eigenvector of H using Lanczos algorithm.
 """
-function solve(solver::LanczosSolver, H::EffectiveHamiltonian, v_init::Vector{T}) where T
+function _solve(solver::LanczosSolver, H::EffectiveHamiltonian, v_init::Vector{T}) where T
     # Handle zero initial vector
     if norm(v_init) == 0
         v_init = randn(T, length(v_init))
@@ -135,8 +133,8 @@ function solve(solver::LanczosSolver, H::EffectiveHamiltonian, v_init::Vector{T}
         V[:, 1] = eigenvec / norm(eigenvec)
         # Build Krylov subspace
         for p = 2:solver.krylov_dim+1
-            # Apply Hamiltonian
-            V[:,p] = apply(H,V[:,p-1])
+            # _apply Hamiltonian
+            V[:,p] = _apply(H,V[:,p-1])
             # Orthogonalize using modified Gram-Schmidt
             for g = p-2:1:p-1
                 if g >= 1
@@ -166,7 +164,7 @@ end
 #For real-time evolution use complex dt = -im*t, for imaginary time use real dt.
 """
 
-function evolve(solver::KrylovExponential, H::EffectiveHamiltonian, v_init::Vector{T}, dt::Number) where T
+function _evolve(solver::KrylovExponential, H::EffectiveHamiltonian, v_init::Vector{T}, dt::Number) where T
     # Handle zero initial vector
     if norm(v_init) == 0
         v_init = randn(T, length(v_init))
@@ -187,7 +185,7 @@ function evolve(solver::KrylovExponential, H::EffectiveHamiltonian, v_init::Vect
 
     for p = 2:solver.krylov_dim+1
         output_vec = 0*output_vec
-        V[:,p] = apply(H,V[:,p-1]) 
+        V[:,p] = _apply(H,V[:,p-1]) 
         for g = p-2:1:p-1
             if g >= 1
                 A_mat[p-1,g] = dot(V[:,p],V[:,g]);

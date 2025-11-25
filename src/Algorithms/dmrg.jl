@@ -16,13 +16,13 @@ function dmrg_sweep(state::MPSState,solver::LanczosSolver,options::DMRGOptions,d
             right_env = state.environment.tensors[site+2]
             Heff = TwoSiteEffectiveHamiltonian(left_env,state.mpo.tensors[site],state.mpo.tensors[site+1],right_env)
 
-            evec,eval = solve(solver,Heff,vec(theta))
+            evec,eval = _solve(solver,Heff,vec(theta))
             last_energy = real(eval)
-            U,S,V = svd_truncate(reshape(evec,(chi_l*d1,d2*chi_r)),options.chi_max,options.cutoff) 
+            U,S,V = _svd_truncate(reshape(evec,(chi_l*d1,d2*chi_r)),options.chi_max,options.cutoff) 
             state.mps.tensors[site] = reshape(U,(chi_l,d1,:))
             @tensoropt state.mps.tensors[site+1][-1,-2,-3] := diagm(S)[-1,4]*reshape(V,(:,d2,chi_r))[4,-2,-3]
             state.center = site+1
-            update_left_environment(state,site) 
+            _update_left_environment(state,site) 
         end
     else
         for site in sites
@@ -33,13 +33,13 @@ function dmrg_sweep(state::MPSState,solver::LanczosSolver,options::DMRGOptions,d
             right_env = state.environment.tensors[site+1] 
             Heff = TwoSiteEffectiveHamiltonian(left_env,state.mpo.tensors[site-1],state.mpo.tensors[site],right_env)
         
-            evec,eval = solve(solver,Heff,vec(theta))
+            evec,eval = _solve(solver,Heff,vec(theta))
             last_energy = real(eval)
-            U,S,V = svd_truncate(reshape(evec,(chi_l*d1,d2*chi_r)),options.chi_max,options.cutoff) 
+            U,S,V = _svd_truncate(reshape(evec,(chi_l*d1,d2*chi_r)),options.chi_max,options.cutoff) 
             state.mps.tensors[site] = reshape(V,(:,d2,chi_r))
             @tensoropt state.mps.tensors[site-1][-1,-2,-3] := reshape(U,(chi_l,d1,:))[-1,-2,4]*diagm(S)[4,-3]
             state.center = site-1
-            update_right_environment(state,site)
+            _update_right_environment(state,site)
         end 
     end
     return last_energy
