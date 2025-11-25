@@ -35,10 +35,10 @@
 #           └── mps_sweep_*.jld2
 #
 # TYPICAL WORKFLOW:
-#   1. Setup: run_id, run_dir = setup_run_directory(config)
-#   2. Run simulation: save_mps_sweep(state, run_dir, sweep; extra_data=...)
-#   3. Finalize: finalize_run(run_dir, status="completed")
-#   4. Later: runs = find_runs_by_config(config)
+#   1. Setup: run_id, run_dir = _setup_run_directory(config)
+#   2. Run simulation: _save_mps_sweep(state, run_dir, sweep; extra_data=...)
+#   3. Finalize: _finalize_run(run_dir, status="completed")
+#   4. Later: runs = _find_runs_by_config(config)
 #   5. Access: mps, data = load_mps_sweep(run_dir, sweep)
 #
 # ============================================================================
@@ -55,7 +55,7 @@ using Printf
 # ============================================================================
 
 """
-    compute_config_hash(config::Dict) -> String
+    _compute_config_hash(config::Dict) -> String
 
 Compute an 8-character hash that uniquely identifies a configuration.
 
@@ -76,7 +76,7 @@ The hash is deterministic: same config always produces the same hash.
 # Example
 ```julia
 config = Dict("system" => Dict("N" => 16), "model" => ...)
-hash = compute_config_hash(config)
+hash = _compute_config_hash(config)
 # Returns: "a3f5b2c1"
 ```
 
@@ -84,7 +84,7 @@ hash = compute_config_hash(config)
 The hash captures EVERYTHING in the config, regardless of structure.
 """
 
-function compute_config_hash(config::Dict)
+function _compute_config_hash(config::Dict)
     # Convert to canonical JSON (consistent formatting)
     # The "2" adds 2-space indentation for readability
     config_str = JSON.json(config, 2)
@@ -99,7 +99,7 @@ end
 
 
 """
-    generate_run_id(config::Dict) -> String
+    _generate_run_id(config::Dict) -> String
 
 Generate a unique identifier for a simulation run.
 
@@ -115,16 +115,16 @@ Format: YYYYMMDD_HHMMSS_HHHHHHHH
 
 # Example
 ```julia
-run_id = generate_run_id(config)
+run_id = _generate_run_id(config)
 # Returns: "20241104_153045_a3f5b2c1"
 ```
 """
 
-function generate_run_id(config::Dict)
+function _generate_run_id(config::Dict)
     # Get current timestamp
     timestamp = Dates.format(now(), "yyyymmdd_HHMMSS")    
     # Get config hash
-    config_hash = compute_config_hash(config)    
+    config_hash = _compute_config_hash(config)    
     # Combine: timestamp_hash
     return "$(timestamp)_$(config_hash)"
 end
@@ -134,7 +134,7 @@ end
 # ============================================================================
 
 """
-    setup_run_directory(config::Dict; base_dir::String="data") -> (String, String)
+    _setup_run_directory(config::Dict; base_dir::String="data") -> (String, String)
 
 Initialize directory structure and files for a new simulation run.
 
@@ -168,7 +168,7 @@ data/
 # Example
 ```julia
 config = JSON.parsefile("sim_tdvp.json")
-run_id, run_dir = setup_run_directory(config, base_dir="data")
+run_id, run_dir = _setup_run_directory(config, base_dir="data")
 
 println("Simulation will save to: \$run_dir")
 # Output: data/tdvp/20241104_153045_a3f5b2c1
@@ -177,22 +177,22 @@ println("Simulation will save to: \$run_dir")
 # Usage in simulation
 ```julia
 # At start
-run_id, run_dir = setup_run_directory(config)
+run_id, run_dir = _setup_run_directory(config)
 
 # During simulation
 for sweep in 1:n_sweeps
     # ... run algorithms ...
-    save_mps_sweep(state, run_dir, sweep; extra_data=...)
+    _save_mps_sweep(state, run_dir, sweep; extra_data=...)
 end
 
 # At end
-finalize_run(run_dir)
+_finalize_run(run_dir)
 ```
 """
 
-function setup_run_directory(config::Dict; base_dir::String="data")
+function _setup_run_directory(config::Dict; base_dir::String="data")
     # Generate unique ID
-    run_id = generate_run_id(config)
+    run_id = _generate_run_id(config)
     
     # Get algorithm type for directory organization
     algorithm = config["algorithm"]["type"]
@@ -238,7 +238,7 @@ function setup_run_directory(config::Dict; base_dir::String="data")
     # ═══════════════════════════════════════════════════════
     # Update master index
     # ═══════════════════════════════════════════════════════
-    update_index(config, run_id, run_dir, base_dir)
+    _update_index(config, run_id, run_dir, base_dir)
     
     # User feedback
     println("✓ Setup complete: $run_dir")
@@ -247,13 +247,13 @@ function setup_run_directory(config::Dict; base_dir::String="data")
 end
 
 """
-    update_index(config::Dict, run_id::String, run_dir::String, base_dir::String)
+    _update_index(config::Dict, run_id::String, run_dir::String, base_dir::String)
 
 Update the master index with a new run entry.
 
 The index is a hash table: config_hash → [list of runs]
 
-This function is called automatically by setup_run_directory(), so you
+This function is called automatically by _setup_run_directory(), so you
 typically don't call it directly.
 
 # Index Structure
@@ -283,7 +283,7 @@ typically don't call it directly.
 - Scales: O(1) regardless of total runs
 """
 
-function update_index(config::Dict, run_id::String, run_dir::String, base_dir::String)
+function _update_index(config::Dict, run_id::String, run_dir::String, base_dir::String)
     index_file = joinpath(base_dir, "runs_index.json")
     
     # Load existing index or create new
@@ -295,7 +295,7 @@ function update_index(config::Dict, run_id::String, run_dir::String, base_dir::S
     end
     
     # Compute hash
-    config_hash = compute_config_hash(config)
+    config_hash = _compute_config_hash(config)
     
     # Initialize array for this hash if doesn't exist
     if !haskey(index["by_config_hash"], config_hash)
@@ -326,7 +326,7 @@ end
 # ============================================================================
 
 """
-    save_mps_sweep(state::MPSState, run_dir::String, sweep::Int; extra_data::Dict=Dict())
+    _save_mps_sweep(state::MPSState, run_dir::String, sweep::Int; extra_data::Dict=Dict())
 
 Save MPS state and observables after a sweep.
 
@@ -339,7 +339,7 @@ Called AFTER EACH SWEEP in the simulation loop.
 
 # Arguments
 - `state::MPSState`: Current simulation state
-- `run_dir::String`: Path to run directory (from setup_run_directory)
+- `run_dir::String`: Path to run directory (from _setup_run_directory)
 - `sweep::Int`: Current sweep number (1, 2, 3, ...)
 - `extra_data::Dict`: Observables to save with this sweep
 
@@ -384,7 +384,7 @@ for sweep in 1:n_sweeps
         "bond_dims" => bond_dims
     )
     
-    save_mps_sweep(state, run_dir, sweep; extra_data=extra_data)
+    _save_mps_sweep(state, run_dir, sweep; extra_data=extra_data)
 end
 ```
 ```julia
@@ -401,12 +401,12 @@ for sweep in 1:n_sweeps
         "bond_dims" => bond_dims
     )
     
-    save_mps_sweep(state, run_dir, sweep; extra_data=extra_data)
+    _save_mps_sweep(state, run_dir, sweep; extra_data=extra_data)
 end
 ```
 """
 
-function save_mps_sweep(state::MPSState, run_dir::String, sweep::Int; extra_data::Dict=Dict())
+function _save_mps_sweep(state::MPSState, run_dir::String, sweep::Int; extra_data::Dict=Dict())
     # ════════════════════════════════════════════════════════════════════════
     # 1. Save MPS to binary file
     # ════════════════════════════════════════════════════════════════════════
@@ -450,7 +450,7 @@ function save_mps_sweep(state::MPSState, run_dir::String, sweep::Int; extra_data
     end
 end
 
-function finalize_run(run_dir::String; status::String="completed")
+function _finalize_run(run_dir::String; status::String="completed")
     metadata_path = joinpath(run_dir, "metadata.json")
     metadata = JSON.parsefile(metadata_path)
     
@@ -467,9 +467,9 @@ function finalize_run(run_dir::String; status::String="completed")
 end
 
 
-function find_runs_by_config(config::Dict, base_dir::String="data")
+function _find_runs_by_config(config::Dict, base_dir::String="data")
     # Compute hash
-    config_hash = compute_config_hash(config)
+    config_hash = _compute_config_hash(config)
     
     # Load index
     index_file = joinpath(base_dir, "runs_index.json")
@@ -487,12 +487,12 @@ function find_runs_by_config(config::Dict, base_dir::String="data")
     end
 end
 
-function config_already_run(config::Dict, base_dir::String="data")
-    return !isempty(find_runs_by_config(config, base_dir))
+function _config_already_run(config::Dict, base_dir::String="data")
+    return !isempty(_find_runs_by_config(config, base_dir))
 end
 
-function get_latest_run_for_config(config::Dict; base_dir::String="data")
-    runs = find_runs_by_config(config, base_dir)
+function _get_latest_run_for_config(config::Dict; base_dir::String="data")
+    runs = _find_runs_by_config(config, base_dir)
     
     if isempty(runs)
         return nothing

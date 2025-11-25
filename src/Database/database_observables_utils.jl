@@ -16,9 +16,9 @@
 #               └── observable_sweep_*.jld2
 #
 # TYPICAL WORKFLOW:
-#   1. Setup: obs_run_id, obs_run_dir = setup_observable_directory(obs_config, sim_run_id, algorithm)
-#   2. Calculate & Save: save_observable_sweep(obs_value, obs_run_dir, sweep; extra_data=...)
-#   3. Finalize: finalize_observable_run(obs_run_dir, status="completed")
+#   1. Setup: obs_run_id, obs_run_dir = _setup_observable_directory(obs_config, sim_run_id, algorithm)
+#   2. Calculate & Save: _save_observable_sweep(obs_value, obs_run_dir, sweep; extra_data=...)
+#   3. Finalize: _finalize_observable_run(obs_run_dir, status="completed")
 #   4. Later: obs_value = load_observable_sweep(obs_run_dir, sweep)
 #
 # ============================================================================
@@ -34,7 +34,7 @@ using Printf
 # ============================================================================
 
 """
-    compute_observable_config_hash(obs_config::Dict) -> String
+    _compute_observable_config_hash(obs_config::Dict) -> String
 
 Compute an 8-character hash that uniquely identifies an observable configuration.
 
@@ -44,7 +44,7 @@ This enables finding duplicate calculations.
 # Returns
 - String: 8 hex characters (e.g., "f4b2c3d1")
 """
-function compute_observable_config_hash(obs_config::Dict)
+function _compute_observable_config_hash(obs_config::Dict)
     # Convert to canonical JSON
     config_str = JSON.json(obs_config, 2)
     
@@ -55,7 +55,7 @@ function compute_observable_config_hash(obs_config::Dict)
 end
 
 """
-    generate_observable_run_id(obs_config::Dict) -> String
+    _generate_observable_run_id(obs_config::Dict) -> String
 
 Generate a unique identifier for an observable calculation run.
 
@@ -65,12 +65,12 @@ Format: YYYYMMDD_HHMMSS_HHHHHHHH
 # Returns
 - String: Unique observable run ID (e.g., "20241104_153045_f4b2c3d1")
 """
-function generate_observable_run_id(obs_config::Dict)
+function _generate_observable_run_id(obs_config::Dict)
     # Get current timestamp
     timestamp = Dates.format(now(), "yyyymmdd_HHMMSS")
     
     # Get observable config hash
-    obs_hash = compute_observable_config_hash(obs_config)
+    obs_hash = _compute_observable_config_hash(obs_config)
     
     # Combine: timestamp_hash
     return "$(timestamp)_$(obs_hash)"
@@ -81,7 +81,7 @@ end
 # ============================================================================
 
 """
-    setup_observable_directory(obs_config, sim_run_id, algorithm; obs_base_dir="observables") 
+    _setup_observable_directory(obs_config, sim_run_id, algorithm; obs_base_dir="observables") 
         -> (String, String)
 
 Initialize directory structure and files for a new observable calculation.
@@ -111,19 +111,19 @@ observables/
 
 # Example
 ```julia
-obs_run_id, obs_run_dir = setup_observable_directory(
+obs_run_id, obs_run_dir = _setup_observable_directory(
     obs_config, 
     "20241103_142530_a3f5b2c1", 
     "tdvp"
 )
 ```
 """
-function setup_observable_directory(obs_config::Dict, 
+function _setup_observable_directory(obs_config::Dict, 
                                     sim_run_id::String, 
                                     algorithm::String; 
                                     obs_base_dir::String="observables")
     # Generate unique observable run ID
-    obs_run_id = generate_observable_run_id(obs_config)
+    obs_run_id = _generate_observable_run_id(obs_config)
     
     # Create full path: observables/algorithm/sim_run_id/obs_run_id
     obs_run_dir = joinpath(obs_base_dir, algorithm, sim_run_id, obs_run_id)
@@ -162,7 +162,7 @@ function setup_observable_directory(obs_config::Dict,
     # ═══════════════════════════════════════════════════════════════════════════
     # Update master observable index
     # ═══════════════════════════════════════════════════════════════════════════
-    update_observable_index(obs_config, sim_run_id, obs_run_id, obs_run_dir, obs_base_dir)
+    _update_observable_index(obs_config, sim_run_id, obs_run_id, obs_run_dir, obs_base_dir)
     
     println("✓ Setup observable directory: $obs_run_dir")
     
@@ -170,7 +170,7 @@ function setup_observable_directory(obs_config::Dict,
 end
 
 """
-    update_observable_index(obs_config, sim_run_id, obs_run_id, obs_run_dir, obs_base_dir)
+    _update_observable_index(obs_config, sim_run_id, obs_run_id, obs_run_dir, obs_base_dir)
 
 Update the master observable index with a new calculation entry.
 
@@ -178,7 +178,7 @@ The index maps: sim_run_id → [list of observable calculations]
 
 This enables quick lookup of all observables calculated for a simulation.
 """
-function update_observable_index(obs_config::Dict, 
+function _update_observable_index(obs_config::Dict, 
                                 sim_run_id::String,
                                 obs_run_id::String, 
                                 obs_run_dir::String,
@@ -202,7 +202,7 @@ function update_observable_index(obs_config::Dict,
         "observable_type" => obs_config["observable"]["type"],
         "observable_params" => obs_config["observable"]["params"],
         "timestamp" => string(now()),
-        "obs_config_hash" => compute_observable_config_hash(obs_config)
+        "obs_config_hash" => _compute_observable_config_hash(obs_config)
     )
     
     # Add to index under sim_run_id
@@ -225,7 +225,7 @@ end
 # ============================================================================
 
 """
-    save_observable_sweep(obs_value, obs_run_dir, sweep; extra_data=Dict())
+    _save_observable_sweep(obs_value, obs_run_dir, sweep; extra_data=Dict())
 
 Save observable value for a single sweep.
 
@@ -246,12 +246,12 @@ Called once per sweep during observable calculation.
 # In calculation loop
 for sweep in sweeps_to_process
     obs_value = calculate_observable(...)
-    save_observable_sweep(obs_value, obs_run_dir, sweep; 
+    _save_observable_sweep(obs_value, obs_run_dir, sweep; 
                          extra_data=Dict("time" => current_time))
 end
 ```
 """
-function save_observable_sweep(obs_value, 
+function _save_observable_sweep(obs_value, 
                               obs_run_dir::String, 
                               sweep::Int; 
                               extra_data::Dict=Dict())
@@ -299,7 +299,7 @@ function save_observable_sweep(obs_value,
 end
 
 """
-    finalize_observable_run(obs_run_dir; status="completed")
+    _finalize_observable_run(obs_run_dir; status="completed")
 
 Mark observable calculation as completed or failed.
 
@@ -307,7 +307,7 @@ Mark observable calculation as completed or failed.
 - `obs_run_dir::String`: Path to observable run directory
 - `status::String`: Final status ("completed" or "failed")
 """
-function finalize_observable_run(obs_run_dir::String; status::String="completed")
+function _finalize_observable_run(obs_run_dir::String; status::String="completed")
     metadata_path = joinpath(obs_run_dir, "metadata.json")
     metadata = JSON.parsefile(metadata_path)
     
@@ -432,7 +432,7 @@ Uses config hash to detect duplicates.
 function observable_already_calculated(obs_config::Dict, 
                                       sim_run_id::String; 
                                       obs_base_dir::String="observables")
-    obs_hash = compute_observable_config_hash(obs_config)
+    obs_hash = _compute_observable_config_hash(obs_config)
     observables = find_observables_for_simulation(sim_run_id, obs_base_dir=obs_base_dir)
     
     for obs in observables
@@ -481,7 +481,7 @@ function find_observable_runs_by_config(obs_config::Dict;
     end
     
     sim_config = JSON.parsefile(sim_config_file)
-    sim_runs = find_runs_by_config(sim_config, base_dir)
+    sim_runs = _find_runs_by_config(sim_config, base_dir)
     
     if isempty(sim_runs)
         return []  # No simulation data exists
@@ -494,7 +494,7 @@ function find_observable_runs_by_config(obs_config::Dict;
     all_obs = find_observables_for_simulation(sim_run_id, obs_base_dir=obs_base_dir)
     
     # Filter by matching config hash
-    obs_hash = compute_observable_config_hash(obs_config)
+    obs_hash = _compute_observable_config_hash(obs_config)
     matching_runs = filter(obs -> obs["obs_config_hash"] == obs_hash, all_obs)
     
     return matching_runs
