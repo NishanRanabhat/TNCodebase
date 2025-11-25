@@ -1,33 +1,31 @@
 using LinearAlgebra
 using TensorOperations
 
-export build_environment, update_left_environment, update_right_environment
-
 # ============= Basic Tensor Contractions =============
 """
-    contract_left_environment(L::Array{T,3}, A::Array{T,3}, W::Array{T,4}) where T
+    _contract_left_environment(L::Array{T,3}, A::Array{T,3}, W::Array{T,4}) where T
 
 Contract left environment tensor with MPS and MPO tensors.
 L[a,b,c] * A[a,s,d] * W[b,e,s,s'] * conj(A)[c,s',d] -> L'[d,e,d]
 """
-function contract_left_environment(L::Array, A::Array, W::Array) 
+function _contract_left_environment(L::Array, A::Array, W::Array) 
     @tensoropt L_new[-1,-2,-3] := L[5,6,7] * conj(A)[5,4,-1] * W[6,-2,4,8] * A[7,8,-3]
     return L_new
 end
 
 """
-    contract_right_environment(R::Array{T,3}, B::Array{T,3}, W::Array{T,4}) where T
+    _contract_right_environment(R::Array{T,3}, B::Array{T,3}, W::Array{T,4}) where T
 
 Contract right environment tensor with MPS and MPO tensors.
 """
-function contract_right_environment(R::Array, B::Array, W::Array) 
+function _contract_right_environment(R::Array, B::Array, W::Array) 
     @tensoropt R_new[-1,-2,-3] := conj(B)[-1,4,5] * W[-2,6,4,8] * B[-3,8,7]* R[5,6,7]
     return R_new
 end
 
 # ============= environment Building =============
 """
-    build_environment(mps::MPS{T}, mpo::MPO{T}, center::Int) where T
+    _build_environment(mps::MPS{T}, mpo::MPO{T}, center::Int) where T
 
 Build environment tensors around the orthogonality center.
 - env[1:center-1] contains left environments
@@ -35,7 +33,7 @@ Build environment tensors around the orthogonality center.
 - env[center] and env[center+1] are nothing (at the orthogonality center)
 """
 
-function build_environment(mps::MPS{Tmps}, mpo::MPO{Tmpo}, center::Int) where {Tmps,Tmpo}
+function _build_environment(mps::MPS{Tmps}, mpo::MPO{Tmpo}, center::Int) where {Tmps,Tmpo}
     #get type of environment
     Tenv = promote_type(Tmps, Tmpo)
 
@@ -51,7 +49,7 @@ function build_environment(mps::MPS{Tmps}, mpo::MPO{Tmpo}, center::Int) where {T
     # Build left environments up to (but not including) center
     for site in 1:center-1
         prev_env = site == 1 ? env_tensors[N+1] : env_tensors[site-1]
-        env_tensors[site] = contract_left_environment(
+        env_tensors[site] = _contract_left_environment(
             prev_env, mps.tensors[site], mpo.tensors[site]
         )
     end
@@ -59,7 +57,7 @@ function build_environment(mps::MPS{Tmps}, mpo::MPO{Tmpo}, center::Int) where {T
     # Build right environments from center+1 to N
     for site in N:-1:center+1
         next_env = env_tensors[site+1]
-        env_tensors[site] = contract_right_environment(
+        env_tensors[site] = _contract_right_environment(
             next_env, mps.tensors[site], mpo.tensors[site]
         )
     end
@@ -76,7 +74,7 @@ end
 Update environment at site i by contracting from site i-1.
 Used when moving orthogonality center rightward.
 """
-function update_left_environment(state::MPSState, site::Int)
+function _update_left_environment(state::MPSState, site::Int)
     N = length(state.mps.tensors)
     @assert 1 <= site <= N "Site must be between 1 and N"
     
@@ -84,7 +82,7 @@ function update_left_environment(state::MPSState, site::Int)
     prev_env = site == 1 ? state.environment.tensors[N+1] : state.environment.tensors[site-1]
     
     # Contract to build left environment at site
-    state.environment.tensors[site] = contract_left_environment(
+    state.environment.tensors[site] = _contract_left_environment(
         prev_env,
         state.mps.tensors[site],
         state.mpo.tensors[site]
@@ -98,7 +96,7 @@ Update environment at site i by contracting from site i+1.
 Used when moving orthogonality center leftward.
 """
 
-function update_right_environment(state::MPSState, site::Int)
+function _update_right_environment(state::MPSState, site::Int)
     N = length(state.mps.tensors)
     @assert 1 <= site <= N "Site must be between 1 and N"
     
@@ -106,7 +104,7 @@ function update_right_environment(state::MPSState, site::Int)
     next_env = state.environment.tensors[site+1]
     
     # Contract to build right environment at site
-    state.environment.tensors[site] = contract_right_environment(
+    state.environment.tensors[site] = _contract_right_environment(
         next_env,
         state.mps.tensors[site],
         state.mpo.tensors[site]

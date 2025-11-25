@@ -1,15 +1,13 @@
 # TensorOps/decompositions.jl
 using LinearAlgebra
 
-export svd_truncate, entropy, truncation_error
-
 """
     svd_truncate(A::Matrix, chi_max::Int, cutoff::Float64)
 
 Perform SVD with truncation based on maximum bond dimension and singular value cutoff.
 Works for both MPS and MPDO since they're reshaped to matrices before calling this.
 """
-function svd_truncate(A::Matrix{T}, chi_max::Int, cutoff::Float64) where T
+function _svd_truncate(A::Matrix{T}, chi_max::Int, cutoff::Float64) where T
     # Same implementation as before
     F = svd(A, alg=LinearAlgebra.QRIteration())
     
