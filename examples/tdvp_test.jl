@@ -6,10 +6,10 @@ using LinearAlgebra
 using BenchmarkTools
 using TensorOperations
 
-push!(LOAD_PATH, joinpath(@__DIR__, "..", "newsrc"))
+push!(LOAD_PATH, joinpath(@__DIR__, "..", "nrc"))
 
 # This both includes MyDMRG.jl and tells Revise to watch every file it pulls in
-includet(joinpath(@__DIR__, "..", "newsrc", "TNCodebase.jl"))
+includet(joinpath(@__DIR__, "..", "src", "TNCodebase.jl"))
 
 using .TNCodebase
 
@@ -17,12 +17,12 @@ using .TNCodebase
 Build the system a site at a time
 """
 
-nmax = 32
+nmax = 6
 spin_site = SpinSite(1/2,T=ComplexF64) #define a spin 1/2 particle 
 boson_site = BosonSite(nmax,T=ComplexF64) #define a Boson with nmax=4 
 
 #build the system by putting the boson at site 0 and spins at rest of the sites
-Ns = 16 #total spins
+Ns = 10 #total spins
 spinboson = vcat(boson_site,fill(spin_site,Ns))
 
 """
@@ -39,7 +39,7 @@ build Hamiltonian as MPO
 #Ising part
 J = -1.0; #coupling strength
 alpha = 1.5; #range of interaction
-n = 7; #number of exponential to approximate the 1/r^a interaction
+n = 4; #number of exponential to approximate the 1/r^a interaction
 h = -1.0;
 
 #define Spin channels
@@ -69,12 +69,13 @@ solver = KrylovExponential(krylov_dim,tol)
 
 #define TDVP options
 dt = 0.01
-chi_max = 100
+chi_max = 50
 cutoff = 0.00000001
 local_dim = 2
 options = TDVPOptions(dt,chi_max,cutoff,local_dim)
 
-for i in 1:200
+for i in 1:20
+    println(i)   
     @time tdvp_sweep(state,solver,options,:right)
     @time tdvp_sweep(state,solver,options,:left)
 end

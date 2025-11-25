@@ -6,8 +6,8 @@
     "observable": {
       "type": "single_site_expectation",
       "params": {
-        "operator": "Sy",
-        "site": 9
+        "operator": "Sz",
+        "site": 4
       }
     },
     

@@ -29,7 +29,7 @@ obs_config = JSON.parsefile("configs/config_observable.json")
 # Find runs
 run_info = get_latest_observable_run_for_config(obs_config)
 
-#print(run_info)
+print(run_info)
 
 # Extract directory yourself
 obs_run_dir = run_info["obs_run_dir"]
@@ -40,7 +40,7 @@ results = load_all_observable_results(obs_run_dir)
 print(obs_run_dir)
 
 # 4. Access the results
-#println("\nResults:")
-#for (sweep, obs_value) in results  # Note: now just (sweep, value), no extra_data
-#    println("Sweep $sweep: ⟨Sy⟩ = $obs_value")
-#end
+println("\nResults:")
+for (sweep, obs_value) in results  # Note: now just (sweep, value), no extra_data
+    println("Sweep $sweep: ⟨Sz⟩ = $obs_value")
+end
