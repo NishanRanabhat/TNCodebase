@@ -39,9 +39,31 @@ function _get_longrange_ising_channels(N, J, alpha, n_exp, h, coupling_dir, fiel
 end
 
 """
-Spin-Boson Model: H = ω b†b + J Σᵢ<ⱼ σᶻᵢσᶻⱼ/|i-j|^α + h Σᵢ σᶻᵢ + g(b+b†)Σᵢ σˣᵢ
+Spin-Boson Model: H = ω b†b + J Σᵢ σᶻᵢσᶻᵢ₊₁ + h Σᵢ σᶻᵢ + g(b+b†)Σᵢ σˣᵢ
 """
-function _get_spinboson_channels(N_spins, J, alpha, n_exp, h, omega, g,
+function _get_spinboson_ising_dikie_channels(N_spins, J, h, omega, g,
+                                spin_coupling_dir, spin_field_dir, boson_coupling_dir)
+    # Spin-spin interactions
+    spinchannel1 = [
+        FiniteRangeCoupling(spin_coupling_dir, spin_coupling_dir, 1, J)
+        Field(spin_field_dir, h)
+    ]
+    
+    # Boson-spin coupling
+    spinchannel2 = [Field(boson_coupling_dir, 1.0)]
+    
+    return [
+        SpinBosonInteraction(spinchannel1, :Ib, 1.0),
+        SpinBosonInteraction(spinchannel2, :a, g),
+        SpinBosonInteraction(spinchannel2, :adag, g),
+        BosonOnly(:Bn, omega)
+    ]
+end
+
+"""
+Spin-Boson Model long-range: H = ω b†b + J Σᵢ<ⱼ σᶻᵢσᶻⱼ/|i-j|^α + h Σᵢ σᶻᵢ + g(b+b†)Σᵢ σˣᵢ
+"""
+function _get_spinboson_longrange_ising_dikie_channels(N_spins, J, alpha, n_exp, h, omega, g,
                                 spin_coupling_dir, spin_field_dir, boson_coupling_dir)
     # Spin-spin interactions
     spinchannel1 = [
@@ -238,8 +260,22 @@ function _get_channels_from_config(config)
         )
         system = (type="spin", N=params["N"], dtype=dtype)
         
-    elseif name == "spin_boson"
-        channels = _get_spinboson_channels(
+    elseif name == "ising_dickie"
+        channels = _get_spinboson_ising_dikie_channels(
+            params["N_spins"],
+            params["J"],
+            params["h"],
+            params["omega"],
+            params["g"],
+            Symbol(params["spin_coupling_dir"]),
+            Symbol(params["spin_field_dir"]),
+            Symbol(params["boson_coupling_dir"])
+        )
+        system = (type="spinboson", N=params["N_spins"]+1, 
+                 nmax=params["nmax"], dtype=dtype)
+                 
+    elseif name == "long_range_ising_dickie"
+        channels = _get_spinboson_longrange_ising_dikie_channels(
             params["N_spins"],
             params["J"],
             params["alpha"],
@@ -252,7 +288,7 @@ function _get_channels_from_config(config)
             Symbol(params["boson_coupling_dir"])
         )
         system = (type="spinboson", N=params["N_spins"]+1, 
-                 nmax=params["nmax"], dtype=dtype)
+                    nmax=params["nmax"], dtype=dtype)
     
     # ────────────────────────────────────────────────────────────────────────
     # Custom Models: Parse channels from config
