@@ -16,8 +16,11 @@ TNCodebase provides a complete framework for tensor network simulations with:
 - **Extensible architecture**: Easy addition of new Hamiltonians, observables, and algorithms
 - **Production-quality code**: Comprehensive testing, documentation, and benchmarks
 
-The package is designed for both method development and large-scale numerical studies, with particular emphasis on long-range interactions and open quantum systems.
+The package implements a fully config-driven workflow for tensor network simulations. Users specify all simulation parameters (system, Hamiltonian, state, algorithm) via a single JSON file. The engine automatically saves all results with complete metadata using a hash-based indexing system: each unique configuration generates an identifying hash for O(1) lookup, preventing redundant calculations and ensuring reproducibility.
 
+A decoupled observable calculation engine computes physical observables on saved MPS states through separate JSON configs, eliminating the need to re-run expensive simulations. All data—from MPS states to observable results—is automatically organized, indexed, and linked via the hash system, creating complete provenance tracking from input configuration to final results.
+
+This architecture is designed for large-scale parameter studies, algorithm development, and collaborative research where reproducibility and efficient data management are critical.
 ---
 
 ## Key Features
