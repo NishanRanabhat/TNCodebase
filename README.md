@@ -30,7 +30,7 @@ The package is designed for both method development and large-scale numerical st
 ### 🎯 **Physical Systems**
 - **Spin chains**: Arbitrary spin-S with custom operators
 - **Long-range interactions**: Exponential and power-law couplings via finite state machines
-- **Spin-boson models**: Coupled spin-boson systems for open quantum dynamics
+- **Spin-boson models**: Coupled spin-boson systems for light-matter interactions
 - **Custom Hamiltonians**: Flexible channel-based construction
 
 ### 📊 **Observables**
@@ -242,9 +242,9 @@ TNCodebase uses JSON configuration files to specify simulations, enabling:
   },
   "algorithm": {
     "type": "dmrg",
-    "solver": { ... },
-    "options": { ... },
-    "run": { ... }
+    "solver": {"type": "lanczos","krylov_dim": 4,"max_iter": 14},
+    "options": {"chi_max": 100,"cutoff": 1e-8,"local_dim": 2},
+    "run": {"n_sweeps": 50}
   }
 }
 ```
@@ -276,11 +276,6 @@ Define models via channel specifications:
 - **Environment caching**: O(N) complexity per sweep for both DMRG and TDVP
 - **Minimal memory allocation**: In-place operations where possible
 - **Scalability**: Successfully tested on systems up to N=500 sites with χ=1000
-
-**Benchmark** (N=100, χ=200, Intel Xeon):
-- DMRG sweep: ~2.5 seconds
-- TDVP sweep: ~3.5 seconds
-
 ---
 
 ## Advanced Features
@@ -310,17 +305,6 @@ runs = find_runs_by_config(config, base_dir="data")
 mps, data = load_mps_sweep(runs[1]["run_dir"], sweep)
 ```
 
----
-
-## Documentation
-
-- **[Quickstart Guide](docs/quickstart.md)**: Get started in 30 minutes
-- **[User Guide](docs/user_guide/)**: Comprehensive tutorials
-- **[API Reference](docs/api_reference/)**: Function documentation
-- **[Examples](examples/)**: Complete working examples with explanations
-
----
-
 ## Algorithm Details
 
 ### DMRG (Density Matrix Renormalization Group)
@@ -335,6 +319,9 @@ mps, data = load_mps_sweep(runs[1]["run_dir"], sweep)
 - Local basis optimization at each time step
 - Compatible with both unitary and non-unitary evolution
 
+### To be added soon
+- A positive tensor network approach for simulating open quantum many-body systems and thermal states
+- based on Phys. Rev. Lett. 116, 237201 (2016) 
 ---
 
 ## Testing
@@ -369,7 +356,7 @@ If you use TNCodebase in your research, please cite:
 
 ```bibtex
 @software{tncodbase2025,
-  author = {Your Name},
+  author = {Nishan Ranabhat},
   title = {TNCodebase: Tensor Network Framework for Quantum Many-Body Dynamics},
   year = {2025},
   url = {https://github.com/yourusername/TNCodebase}
@@ -381,13 +368,11 @@ If you use TNCodebase in your research, please cite:
 ## Related Methods
 
 The algorithms implemented in TNCodebase are directly applicable to:
-- **Quantum chemistry**: Multi-configurational electronic structure (DMRG-SCF, DMRG-CASPT2)
-- **Nuclear structure**: Shell model calculations
 - **Condensed matter**: Frustrated magnets, topological phases
 - **Quantum information**: Entanglement dynamics, quantum circuits
 - **AMO physics**: Cold atoms in optical lattices
 
-The TDVP algorithm is mathematically equivalent to TD-DMRG and MCTDH in appropriate limits.
+The TDVP algorithm is mathematically equivalent to TD-DMRG in appropriate limits.
 
 ---
 
@@ -400,15 +385,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Contact
 
 **[Your Name]**  
-PhD Candidate, [Your University]  
-Email: your.email@university.edu  
-GitHub: [@yourusername](https://github.com/yourusername)
+[Nishan Ranabhat]  
+Email: nishanranabhat101@gmail.com  
+GitHub: [@NishanRanabhat](https://github.com/NishanRanabhat)
 
 ---
 
 ## Acknowledgments
 
-- Developed as part of PhD research on tensor network methods for quantum many-body systems
+- Developed as part of PhD research at SISSA and postdoctoral work at UMBC
 - Algorithms based on foundational work by White (1992), Haegeman et al. (2011), and others
 - Built using Julia's ecosystem: TensorOperations.jl, JLD2.jl, JSON.jl
 
