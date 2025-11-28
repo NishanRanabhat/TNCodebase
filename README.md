@@ -21,6 +21,7 @@ The package implements a fully config-driven workflow for tensor network simulat
 A decoupled observable calculation engine computes physical observables on saved MPS states through separate JSON configs, eliminating the need to re-run expensive simulations. All data—from MPS states to observable results—is automatically organized, indexed, and linked via the hash system, creating complete provenance tracking from input configuration to final results.
 
 This architecture is designed for large-scale parameter studies, algorithm development, and collaborative research where reproducibility and efficient data management are critical.
+
 ---
 
 ## Key Features
