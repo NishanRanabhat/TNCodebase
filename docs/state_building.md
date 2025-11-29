@@ -80,7 +80,7 @@ end
 **Construction:**
 ```julia
 spin_site = SpinSite(0.5, T=ComplexF64)  # Spin-1/2
-spin_site = SpinSite(1.0, T=Float64)     # Spin-1
+spin_site = SpinSite(1.0, T=ComplexF64)     # Spin-1
 ```
 
 **Parameters:**
