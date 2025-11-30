@@ -1,0 +1,7 @@
+{
+  "model": {"name": "custom_spin","params": {"N": 30,"d": 2,"dtype": "Float64",
+      "channels": [{"type": "PowerLawCoupling","op1": "Z","op2": "Z","strength": 1.0,"alpha": 1.5,"n_exp": 10,"N": 30,
+                    "description": "Long-range Ising interaction: J * sum_{i<j} sigma_z^i sigma_z^j / |i-j|^1.5"},
+                   {"type": "Field","op": "X","strength": 0.5,
+                    "description": "Transverse field: h * sum_i sigma_x^i"}]}}
+}
