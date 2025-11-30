@@ -36,7 +36,7 @@ This architecture is designed for large-scale parameter studies, algorithm devel
 - **Spin-boson models**: Coupled spin-boson systems for light-matter interactions
 - **Custom Hamiltonians**: Flexible channel-based construction
 
-### 📊 **Observables** (Coming Soon)
+### 📊 **Observables** (Examples coming Soon)
 - Single-site and two-site expectation values
 - Correlation functions (connected and raw)
 - Entanglement entropy and spectrum
