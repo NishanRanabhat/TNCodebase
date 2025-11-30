@@ -245,9 +245,6 @@ TNCodebase uses JSON configuration files to specify simulations, enabling:
   }
 }
 ```
-
-See [`docs/config_reference.md`](docs/config_reference.md) for complete specification.
-
 ---
 
 ## Implemented Models
