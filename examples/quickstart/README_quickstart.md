@@ -11,7 +11,6 @@ This example demonstrates a complete DMRG ground state search from start to fini
 - ✅ Energy convergence tracking
 - ✅ Automatic data saving with reproducible indexing
 
-**Runtime:** ~5-10 seconds  
 **Complexity:** Beginner-friendly  
 **Prerequisites:** Package installed and activated
 
@@ -33,14 +32,9 @@ H = J Σᵢ σᶻᵢσᶻᵢ₊₁ + h Σᵢ σˣᵢ
 - **h = 0.5** (transverse field): Quantum fluctuations try to flip spins to X direction
 - **Competition:** J vs h determines the ground state
 
-**Phase diagram:**
-- h < h_c ≈ 1.0: **Ordered phase** (spins aligned, net magnetization)
-- h > h_c ≈ 1.0: **Disordered phase** (quantum paramagnet, no magnetization)
-
 **Our parameters (h=0.5):**
 - Well below critical point
 - Ground state is magnetically ordered
-- Expected energy: E₀ ≈ -19.0
 
 ### Algorithm
 
@@ -54,7 +48,7 @@ Uses **Density Matrix Renormalization Group (DMRG)**:
 
 **Convergence:**
 - Energy should stabilize after 20-30 sweeps
-- Bond dimension grows to ~15-20 (true entanglement of ground state)
+- Bond dimension grows to ~15-30 (true entanglement of ground state)
 - Final energy change ΔE < 10⁻⁸
 
 ---
@@ -174,14 +168,10 @@ The `config.json` file has four main sections:
 ```json
 "h": 1.5  // Change from 0.5 to 1.5 (above critical point)
 ```
-Expected: E₀ ≈ -15 to -17 (less negative, paramagnet)
-
 **2. Increase system size:**
 ```json
 "N": 40  // Change from 20 to 40
 ```
-Expected: Longer runtime (~15 sec), E₀ ≈ -38
-
 **3. Reduce bond dimension:**
 ```json
 "chi_max": 30  // Change from 100 to 30
@@ -203,7 +193,6 @@ Expected: Better convergence confirmation
 You'll see messages like:
 ```
 Starting DMRG simulation...
-(This should take 10-20 seconds)
 ```
 
 Your actual implementation may print sweep-by-sweep progress. That's normal!
@@ -213,7 +202,6 @@ Your actual implementation may print sweep-by-sweep progress. That's normal!
 **Key results:**
 ```
 Sweep 50 (final):
-  Energy:     -18.956...
   Bond dim:   18
 ```
 
