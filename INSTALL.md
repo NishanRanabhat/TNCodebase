@@ -5,7 +5,7 @@
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/NishanRanabhat/Package_Dev.git
+git clone https://github.com/NishanRanabhat/TNCodebase.git
 cd TNCodebase
 ```
 
