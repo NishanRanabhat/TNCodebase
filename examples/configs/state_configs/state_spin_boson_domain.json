@@ -1,4 +1,0 @@
-{
-  "system": {"type": "spinboson","N_spins": 10,"nmax":10,"S": 0.5},
-  "state": {"type": "prebuilt","name": "domain","params": {"boson_level":4,"spin_direction": "Z","start_index": 5,"domain_size": 2,"base_state": 1,"flip_state": 2}}
-}

@@ -1,4 +1,0 @@
-{
-  "system": {"type": "spin","N": 20,"S": 0.5},
-  "state": {"type": "prebuilt","name": "polarized","params": {"spin_direction": "X","eigenstate": 2}}
-}
