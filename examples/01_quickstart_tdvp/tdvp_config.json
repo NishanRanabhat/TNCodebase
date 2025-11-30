@@ -1,0 +1,12 @@
+{
+  "system": {"type": "spin","N": 20},
+  "model": {"name": "transverse_field_ising",
+            "params": {"N": 20,"J": -1.0,"h": 2.0,"coupling_dir": "Z","field_dir": "X"}},
+  "state": {"type": "prebuilt",
+            "name": "polarized",
+            "params": {"spin_direction": "Z","eigenstate": 2}},
+  "algorithm": {"type": "tdvp",
+                "solver": {"type": "krylov_exponential","krylov_dim": 14,"tol": 1e-8},
+                "options": {"dt": 0.02,"chi_max": 100,"cutoff": 1e-8,"local_dim": 2},
+                "run": {"n_sweeps": 200}}
+}
