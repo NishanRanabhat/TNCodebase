@@ -2,7 +2,7 @@
 
 ## Overview
 
-This directory contains examples using TNCodebase's **prebuilt state templates**. These templates provide simple configurations for common initial states used in MPS simulations.
+This directory contains examples using TNCodebase's **prebuilt state templates**. These templates provide simple configurations for common initial states used in MPS (TDVP and DMRG) simulations.
 
 **What are initial states?**
 - Starting point for DMRG, TDVP, and other MPS algorithms
