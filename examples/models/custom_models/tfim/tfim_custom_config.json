@@ -1,0 +1,27 @@
+{
+  "model": {
+    "name": "custom_spin",
+    "params": {
+      "N": 20,
+      "d": 2,
+      "dtype": "Float64",
+      "channels": [
+        {
+          "type": "FiniteRangeCoupling",
+          "op1": "Z",
+          "op2": "Z",
+          "range": 1,
+          "strength": -1.0,
+          "description": "ZZ coupling: J * sum_i S^z_i S^z_{i+1}"
+        },
+        {
+          "type": "Field",
+          "op": "X",
+          "strength": 0.5,
+          "description": "Transverse field: h * sum_i S^x_i"
+        }
+      ],
+      "description": "Transverse Field Ising Model: H = J*ZZ + h*X"
+    }
+  }
+}
