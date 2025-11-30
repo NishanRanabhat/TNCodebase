@@ -37,7 +37,7 @@ This architecture is designed for large-scale parameter studies, algorithm devel
 - **Spin-boson models**: Coupled spin-boson systems for light-matter interactions
 - **Custom Hamiltonians**: Flexible channel-based construction
 
-### 📊 **Observables**
+### 📊 **Observables** (Coming Soon)
 - Single-site and two-site expectation values
 - Correlation functions (connected and raw)
 - Entanglement entropy and spectrum
@@ -73,7 +73,7 @@ using JSON
 using TNCodebase
 
 # 1. Define simulation via config file
-config = JSON.parsefile("examples/01_ground_state_dmrg/config.json")
+config = JSON.parsefile("examples/00_quickstart_dmrg/config.json")
 
 # 2. Run simulation (auto-saves results)
 state, run_id, run_dir = run_simulation_from_config(config)
@@ -82,10 +82,10 @@ state, run_id, run_dir = run_simulation_from_config(config)
 latest = get_latest_run_for_config(config, base_dir="data")
 mps, extra_data = load_mps_sweep(latest["run_dir"], 50)
 
-# 4. Calculate observables
-obs_config = JSON.parsefile("examples/observables/magnetization.json")
-obs_run_id, obs_run_dir = run_observable_calculation_from_config(obs_config)
-results = load_all_observable_results(obs_run_dir)
+# 4. Calculate observables (coming soon)
+# obs_config = JSON.parsefile("examples/observables/magnetization.json")
+# obs_run_id, obs_run_dir = run_observable_calculation_from_config(obs_config)
+# results = load_all_observable_results(obs_run_dir)
 ```
 
 ---
@@ -158,30 +158,21 @@ config = Dict(
 # Run time evolution
 state, run_id, run_dir = run_simulation_from_config(config, base_dir="data")
 
-# Calculate time-dependent magnetization
-obs_config = Dict(
-    "simulation" => Dict("config_file" => "config.json"),
-    "observable" => Dict(
-        "type" => "subsystem_expectation_sum",
-        "params" => Dict("operator" => "Sz", "l" => 1, "m" => 40)
-    ),
-    "sweeps" => Dict("selection" => "all")
-)
-
-obs_run_id, obs_run_dir = run_observable_calculation_from_config(obs_config)
-results = load_all_observable_results(obs_run_dir)
-
-# Extract time and magnetization
-times = [metadata["sweep_data"][i]["time"] for i in 1:length(results)]
-magnetization = [results[i][2] for i in 1:length(results)]
-
-plot(times, magnetization,
-     xlabel="Time", ylabel="⟨Σᵢ Sᶻᵢ⟩",
-     title="Quantum Quench Dynamics",
-     legend=false, linewidth=2)
+# Calculate time-dependent observables (coming soon)
+# obs_config = Dict(
+#     "simulation" => Dict("config_file" => "config.json"),
+#     "observable" => Dict(
+#         "type" => "subsystem_expectation_sum",
+#         "params" => Dict("operator" => "Sz", "l" => 1, "m" => 40)
+#     ),
+#     "sweeps" => Dict("selection" => "all")
+# )
+# 
+# obs_run_id, obs_run_dir = run_observable_calculation_from_config(obs_config)
+# results = load_all_observable_results(obs_run_dir)
 ```
 
-**Output**: Shows relaxation dynamics after sudden quench.
+**Output**: Shows time evolution dynamics after quantum quench.
 
 ---
 
@@ -199,11 +190,14 @@ TNCodebase/
 │   └── Analysis/              # Observable calculations
 │
 ├── examples/                   # Complete working examples
-│   ├── 01_ground_state_dmrg/
-│   ├── 02_time_evolution_tdvp/
-│   ├── 03_entanglement_analysis/
-│   ├── 04_long_range_interactions/
-│   └── 05_spin_boson_model/
+│   ├── 00_quickstart_dmrg/    # DMRG ground state search
+│   ├── 01_quickstart_tdvp/    # TDVP time evolution
+│   ├── models/                # Model building examples
+│   │   ├── prebuilt_models/   # Template-based models + reference
+│   │   └── custom_models/     # Channel-based construction
+│   └── states/                # State preparation examples
+│       ├── prebuilt_states/   # Template-based states + reference
+│       └── custom_states/     # Site-by-site specification
 │
 ├── docs/                       # Documentation
 │   ├── quickstart.md
@@ -280,6 +274,7 @@ Define models via channel specifications:
 - **Environment caching**: O(N) complexity per sweep for both DMRG and TDVP
 - **Minimal memory allocation**: In-place operations where possible
 - **Scalability**: Successfully tested on systems up to N=500 sites with χ=1000
+
 ---
 
 ## Advanced Features
@@ -288,7 +283,7 @@ Define models via channel specifications:
 Implements power-law interactions using sum-of-exponentials decomposition, enabling efficient MPO construction:
 
 ```
-1/r^α ≈ Σᵢ νᵢ λᵢ^r
+1/r^α ≈ Σᵢ νᵢ λᵢʳ
 ```
 
 Reduces bond dimension from O(N) to O(log N) while maintaining accuracy.
@@ -326,6 +321,7 @@ mps, data = load_mps_sweep(runs[1]["run_dir"], sweep)
 ### To be added soon
 - A positive tensor network approach for simulating open quantum many-body systems and thermal states
 - based on Phys. Rev. Lett. 116, 237201 (2016) 
+
 ---
 
 ## Testing
@@ -388,8 +384,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-**[Your Name]**  
-[Nishan Ranabhat]  
+**Nishan Ranabhat**  
 Email: nishanranabhat101@gmail.com  
 GitHub: [@NishanRanabhat](https://github.com/NishanRanabhat)
 
