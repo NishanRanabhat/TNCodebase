@@ -14,7 +14,7 @@ println("Prebuilt Long-Range Ising Template")
 println("="^70)
 
 # Load configuration
-config_file = joinpath(@__DIR__, "model_config.json")
+config_file = joinpath(@__DIR__, "prebuilt_longrange_config.json")
 config = JSON.parsefile(config_file)
 
 println("\nTemplate: $(config["model"]["name"])")
@@ -27,16 +27,11 @@ println("  α (power-law):   $(params["alpha"])")
 println("  K (exponentials): $(params["n_exp"])")
 println("  h (field):       $(params["h"])")
 
-# Build sites and MPO
-println("\n" * "─"^70)
-sites = _build_sites_from_config(config["system"])
-println("✓ Built $(length(sites)) sites")
-
 mpo = build_mpo_from_config(config)
 println("✓ Built MPO from template (FSM applied automatically)")
 
 # Show MPO structure
-bond_dims = [size(W, 4) for W in mpo.tensors[1:end-1]]
+bond_dims = [size(W, 2) for W in mpo.tensors[1:end-1]]
 max_bond_dim = maximum(bond_dims)
 
 println("\nMPO Structure:")

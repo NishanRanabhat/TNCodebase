@@ -14,7 +14,7 @@ println("Prebuilt TFIM Template")
 println("="^70)
 
 # Load configuration
-config_file = joinpath(@__DIR__, "model_config.json")
+config_file = joinpath(@__DIR__, "prebuilt_tfim_config.json")
 config = JSON.parsefile(config_file)
 
 println("\nTemplate: $(config["model"]["name"])")
@@ -27,16 +27,12 @@ println("  h (field):       $(params["h"])")
 println("  Coupling dir:    $(params["coupling_dir"])")
 println("  Field dir:       $(params["field_dir"])")
 
-# Build sites and MPO
-println("\n" * "─"^70)
-sites = _build_sites_from_config(config["system"])
-println("✓ Built $(length(sites)) sites")
 
 mpo = build_mpo_from_config(config)
 println("✓ Built MPO from template")
 
 # Show MPO structure
-bond_dims = [size(W, 4) for W in mpo.tensors[1:end-1]]
+bond_dims = [size(W, 2) for W in mpo.tensors[1:end-1]]
 max_bond_dim = maximum(bond_dims)
 
 println("\nMPO Structure:")
