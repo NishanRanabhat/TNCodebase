@@ -1,0 +1,22 @@
+{
+  "system": {
+    "type": "spin",
+    "N": 30,
+    "S": 0.5,
+    "dtype": "Float64"
+  },
+  
+  "model": {
+    "name": "long_range_ising",
+    "params": {
+      "N": 30,
+      "J": 1.0,
+      "alpha": 1.5,
+      "n_exp": 10,
+      "h": 0.0,
+      "coupling_dir": "Z",
+      "field_dir": "X",
+      "dtype": "Float64"
+    }
+  }
+}
