@@ -105,8 +105,6 @@ This has bond dimension **χ = 1** (single FSM state)!
 
 **Problem:** Approximate f(r) = 1/r^α on interval [1, N]
 
-**Method:** QR-based optimization (SciPost Phys. 12, 126 (2022), Appendix C)
-
 **Steps:**
 1. Choose K exponential bases λₖ (via QR decomposition)
 2. Solve least-squares for coefficients νₖ
@@ -221,68 +219,6 @@ H = Σᵢ<ⱼ σᶻᵢσᶻⱼ/|i-j|^1.5 + 0.5 Σᵢ σˣᵢ
 cd examples/models/custom/advanced_fsm
 julia build_and_analyze.jl
 ```
----
-
-## Experiments to Try
-
-### 1. Vary Power-Law Exponent
-
-**Edit config.json:**
-```json
-"alpha": 0.5   // Very long-range (nearly mean-field)
-"alpha": 1.0   // 1/r interaction
-"alpha": 2.0   // 1/r² interaction
-"alpha": 3.0   // Shorter-range
-```
-
-**Observe:**
-- Smaller α needs more exponentials for accuracy
-- Larger α could use fewer exponentials
-
-### 2. Change Number of Exponentials
-
-**Edit config.json:**
-```json
-"n_exp": 5    // Faster, less accurate (~5% error)
-"n_exp": 15   // Slower, more accurate (~0.3% error)
-```
-
-**Observe:**
-- Bond dimension changes from ~7 to ~14
-- Trade-off between accuracy and efficiency
-
-### 3. Increase System Size
-
-**Edit config.json:**
-```json
-"N": 50     // Larger system
-"N": 100    // Even larger
-```
-
-**Observe:**
-- FSM bond dimension stays ~12
-- Naive bond dimension would be 50 or 100
-- Efficiency gain increases!
-
-### 4. Compare to Short-Range
-
-**Replace PowerLawCoupling with:**
-```json
-{
-  "type": "FiniteRangeCoupling",
-  "op1": "Z",
-  "op2": "Z",
-  "range": 1,
-  "strength": 1.0
-}
-```
-
-**Observe:**
-- Bond dimension ~5 (much smaller!)
-- Short-range is easier
-- Different physics (no long-range effects)
-
----
 
 ## Implementation Details
 
@@ -365,48 +301,6 @@ The QR-based method finds near-optimal {λₖ} by:
 - **SWAP networks:** Explicit long-range gates (circuit-based)
 
 **FSM-MPO is the state-of-the-art for tensor networks.**
-
----
-
-## Next Steps
-
-### Use This Model in Simulations
-
-**DMRG ground state:**
-```bash
-# Copy config to quickstart
-cp model_config.json ../../00_quickstart/config.json
-
-# Add algorithm section to config
-# Run DMRG
-cd ../../00_quickstart
-julia run_dmrg.jl
-```
-
-**Observe:**
-- Ground state with long-range order
-- Correlations decay as 1/r^1.5
-- Different from short-range physics
-
-### Explore Other Examples
-
-**Short-range model:**
-- `examples/models/prebuilt/tfim/` - Compare to this
-
-**Custom models:**
-- `examples/models/custom/basic_channels/` - Simpler channel example
-
-**Time evolution:**
-- Add TDVP algorithm section
-- See long-range dynamics
-
-### Read Documentation
-
-**Comprehensive guides:**
-- `docs/model_building.md` - Full model building documentation
-- Section on FSM has more mathematical details
-
----
 
 ## Summary
 
