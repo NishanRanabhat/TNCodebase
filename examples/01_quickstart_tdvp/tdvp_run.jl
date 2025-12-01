@@ -55,6 +55,8 @@ println("  χ_max:        $(config["algorithm"]["options"]["chi_max"])")
 println("  Cutoff:       $(config["algorithm"]["options"]["cutoff"])")
 println("  Solver:       $(config["algorithm"]["solver"]["type"])")
 println("  Krylov dim:   $(config["algorithm"]["solver"]["krylov_dim"])")
+println("  Evol type:    $(config["algorithm"]["solver"]["evol_type"])")
+
 println("─"^70)
 
 # ============================================================================
