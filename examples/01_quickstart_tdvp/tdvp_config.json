@@ -6,7 +6,7 @@
             "name": "polarized",
             "params": {"spin_direction": "Z","eigenstate": 2}},
   "algorithm": {"type": "tdvp",
-                "solver": {"type": "krylov_exponential","krylov_dim": 14,"tol": 1e-8},
+                "solver": {"type": "krylov_exponential","krylov_dim": 14,"tol": 1e-8,"evol_type":"real"},
                 "options": {"dt": 0.02,"chi_max": 100,"cutoff": 1e-8,"local_dim": 2},
                 "run": {"n_sweeps": 200}}
 }
