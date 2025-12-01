@@ -25,3 +25,5 @@ function random_state(sites::Vector{<:AbstractSite},bond_dim::Int;T=ComplexF64)
     Ts[N] = rand(T, bond_dim,sites[N].dim, 1)
     return MPS{T}(Ts)
 end
+
+
