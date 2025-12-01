@@ -167,7 +167,7 @@ end
 #For real-time evolution use complex dt = -im*t, for imaginary time use real dt.
 """
 
-function _evolve(solver::KrylovExponential, H::EffectiveHamiltonian, v_init::Vector{T}, dt::Number) where T
+function _evolve(solver::KrylovExponential, H::EffectiveHamiltonian, v_init::Vector{T}, dt::Real) where T
     # Handle zero initial vector
     if norm(v_init) == 0
         v_init = randn(T, length(v_init))
