@@ -164,7 +164,6 @@ end
 #    evolve(solver::KrylovExponential, H, v_init, dt)
 
 #Evolve state v_init by time dt under Hamiltonian H using Krylov method.
-#For real-time evolution use complex dt = -im*t, for imaginary time use real dt.
 """
 
 function _evolve(solver::KrylovExponential, H::EffectiveHamiltonian, v_init::Vector{T}, dt::Real) where T
