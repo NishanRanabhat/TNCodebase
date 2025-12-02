@@ -772,7 +772,6 @@ Adding new channel types requires:
 
 1. **MPO formalism:** Schollwöck, Ann. Phys. **326**, 96 (2011)
 2. **FSM for Hamiltonians:** Crosswhite et al., Phys. Rev. A **78**, 012356 (2008)
-3. **Power-law decomposition:** Stoudenmire & White, SciPost Phys. **12**, 126 (2022)
 
 ### Code Implementation
 
