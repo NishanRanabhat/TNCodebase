@@ -1,0 +1,7 @@
+{
+    "system": {"type": "spin","N": 20,"description": "Quickstart example - Heisenberg ground state search"},
+    "model":{"name": "heisenberg","params": {"N": 20,"Jx": 1.0,"Jy": 1.0,"Jz": 1.0,"hx": 0.0,"hy": 0.0,"hz": 0.0,"dtype": "ComplexF64"}},
+    "state": {"type": "random","params":{"bond_dim":5}},
+    "algorithm": {"type": "dmrg","solver": {"type": "lanczos","krylov_dim": 4,"max_iter": 14},"options": {"chi_max": 40,"cutoff": 1e-8,"local_dim": 2},"run": {"n_sweeps": 50}}
+  }
+
