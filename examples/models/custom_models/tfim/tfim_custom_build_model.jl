@@ -20,11 +20,10 @@ println("="^70)
 # LOAD CONFIGURATION
 # ============================================================================
 
-config_file = joinpath(@__DIR__, "model_config.json")
+config_file = joinpath(@__DIR__, "tfim_custom_config.json")
 config = JSON.parsefile(config_file)
 
 println("\nConfiguration:")
-println("  System: $(config["system"]["N"]) spin-$(config["system"]["S"]) sites")
 println("  Channels: $(length(config["model"]["params"]["channels"]))")
 
 # Show each channel
@@ -41,16 +40,6 @@ h = config["model"]["params"]["channels"][2]["strength"]
 println("\nPhysical parameters:")
 println("  J (coupling): $J")
 println("  h (field):    $h")
-
-# ============================================================================
-# BUILD SITES
-# ============================================================================
-
-println("\n" * "─"^70)
-println("Building sites...")
-sites = _build_sites_from_config(config["system"])
-println("✓ Created $(length(sites)) sites")
-println("  Each site has dimension d = $(sites[1].dim)")
 
 # ============================================================================
 # BUILD MPO

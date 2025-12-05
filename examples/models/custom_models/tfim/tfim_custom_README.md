@@ -60,7 +60,7 @@ Creates: h Σᵢ σˣᵢ
 ### Run the Example
 
 ```bash
-cd examples/models/custom/tfim
+cd examples/models/custom_models/tfim
 julia build_model.jl
 ```
 
