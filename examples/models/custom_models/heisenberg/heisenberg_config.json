@@ -4,7 +4,7 @@
     "params": {
       "N": 20,
       "d": 2,
-      "dtype": "Float64",
+      "dtype": "ComplexF64",
       "channels": [
         {
           "type": "FiniteRangeCoupling",

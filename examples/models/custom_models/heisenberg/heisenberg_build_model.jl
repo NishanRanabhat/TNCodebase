@@ -20,11 +20,10 @@ println("="^70)
 # LOAD CONFIGURATION
 # ============================================================================
 
-config_file = joinpath(@__DIR__, "model_config.json")
+config_file = joinpath(@__DIR__, "heisenberg_config.json")
 config = JSON.parsefile(config_file)
 
 println("\nConfiguration:")
-println("  System: $(config["system"]["N"]) spin-$(config["system"]["S"]) sites")
 println("  Channels: $(length(config["model"]["params"]["channels"]))")
 
 # Show each channel
@@ -33,16 +32,6 @@ for (i, ch) in enumerate(config["model"]["params"]["channels"])
     println("  $i. $(ch["type"])")
     println("     → $(ch["description"])")
 end
-
-# ============================================================================
-# BUILD SITES
-# ============================================================================
-
-println("\n" * "─"^70)
-println("Building sites...")
-sites = _build_sites_from_config(config["system"])
-println("✓ Created $(length(sites)) sites")
-println("  Each site has dimension d = $(sites[1].dim)")
 
 # ============================================================================
 # BUILD MPO
