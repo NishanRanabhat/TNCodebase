@@ -1,0 +1,47 @@
+{
+    "system": {"type": "spin","N": 20,"description": "Quickstart example - XXZ model ground state search"},
+    "model": {
+        "name": "custom_spin",
+        "params": {
+          "N": 20,
+          "d": 2,
+          "dtype": "ComplexF64",
+          "channels": [
+            {
+              "type": "FiniteRangeCoupling",
+              "op1": "X",
+              "op2": "X",
+              "range": 1,
+              "strength": 1.0,
+              "description": "XX coupling: J_x * sum_i S^x_i S^x_{i+1}"
+            },
+            {
+              "type": "FiniteRangeCoupling",
+              "op1": "Y",
+              "op2": "Y",
+              "range": 1,
+              "strength": 1.0,
+              "description": "YY coupling: J_y * sum_i S^y_i S^y_{i+1}"
+            },
+            {
+              "type": "FiniteRangeCoupling",
+              "op1": "Z",
+              "op2": "Z",
+              "range": 1,
+              "strength": 2.0,
+              "description": "ZZ coupling: J_z * sum_i S^z_i S^z_{i+1}"
+            },
+            {
+              "type": "Field",
+              "op": "Z",
+              "strength": 0.5,
+              "description": "Longitudinal field: hz * sum_i S^z_i"
+            }
+          ],
+          "description": "XXZ model: H = J_xy*(XX + YY) + J_z*ZZ + h*Z"
+        }
+      },
+    "state": {"type": "random","params":{"bond_dim":5}},
+    "algorithm": {"type": "dmrg","solver": {"type": "lanczos","krylov_dim": 4,"max_iter": 14},"options": {"chi_max": 40,"cutoff": 1e-8,"local_dim": 2},"run": {"n_sweeps": 50}}
+  }
+
