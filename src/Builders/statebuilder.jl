@@ -116,7 +116,7 @@ end
 """
 Boson in specific Fock state + all spins polarized
 """
-function _get_label_spinboson_ploarized(N_spins::Int, boson_level::Int,
+function _get_label_spinboson_polarized(N_spins::Int, boson_level::Int,
                                         spin_direction::Symbol, spin_eigenstate::Int)
     spin_label = fill((spin_direction, spin_eigenstate), N_spins)
     return vcat(boson_level, spin_label)
@@ -344,7 +344,7 @@ function _build_spinboson_prebuilt_state(sites, config, system_config)
     # Generate pattern based on name
     if name == "polarized"
         spin_eigenstate = get(params, "spin_eigenstate", 2)
-        pattern = _get_label_spinboson_ploarized(N_spins, boson_level,
+        pattern = _get_label_spinboson_polarized(N_spins, boson_level,
                                                 spin_direction, spin_eigenstate)
         
     elseif name == "neel"
