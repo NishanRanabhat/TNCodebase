@@ -84,16 +84,33 @@ hash = _compute_config_hash(config)
 The hash captures EVERYTHING in the config, regardless of structure.
 """
 
+const SIMULATION_KEYS = ["system", "model", "state", "algorithm"]
+
+"""
+Extract only simulation-relevant sections from config.
+Ignores "info" and any other non-simulation sections.
+"""
+function _normalize_config_for_hash(config::Dict)
+    normalized = Dict{String, Any}()
+    for key in SIMULATION_KEYS
+        if haskey(config, key)
+            normalized[key] = config[key]
+        end
+    end
+    return normalized
+end
+
 function _compute_config_hash(config::Dict)
+    # Normalize: extract only simulation-relevant sections
+    normalized = _normalize_config_for_hash(config)
+    
     # Convert to canonical JSON (consistent formatting)
-    # The "2" adds 2-space indentation for readability
-    config_str = JSON.json(config, 2)
+    config_str = JSON.json(normalized, 2)
     
     # Compute SHA256 and convert to hex string
     hash_full = bytes2hex(sha256(config_str))
     
     # Take first 8 characters
-    # This is sufficient for our use case (billions of unique values)
     return hash_full[1:8]
 end
 
