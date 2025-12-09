@@ -1,0 +1,8 @@
+{
+  "system": {"type": "spin", "N": 20},
+  "model": {"name": "long_range_ising","params": {"N": 20,"J": 1.0,"alpha": 1.5,"n_exp": 8,"h": 0.5,"coupling_dir": "Z","field_dir": "X","dtype": "Float64"}},
+  "state": {"type": "prebuilt","name": "domain","params": {"spin_direction": "Z","start_index": 8,"domain_size": 4,"base_state": 1,"flip_state": 2}},
+  "algorithm": {"type": "tdvp","solver": {"type": "krylov_exponential", "krylov_dim": 14, "tol": 1e-8, "evol_type": "real"},
+                "options": {"dt": 0.02, "chi_max": 60, "cutoff": 1e-8, "local_dim": 2},
+                "run": {"n_sweeps": 200}}
+}
