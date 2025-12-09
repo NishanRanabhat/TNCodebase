@@ -64,10 +64,37 @@ Builds:
 4. Runs algorithm with specified solver and options
 """
 
-function run_simulation_from_config(config; base_dir="data")
+function run_simulation_from_config(config; base_dir="data",force_rerun=false)
     println("="^70)
     println("Starting Simulation from Config")
     println("="^70)
+
+    # ════════════════════════════════════════════════════════════════════════
+    # DEDUPLICATION CHECK (before anything else!)
+    # ════════════════════════════════════════════════════════════════════════
+    
+    println("\n[0/5] Checking for existing runs...")
+    
+    if !force_rerun
+        existing = _get_completed_run(config, base_dir=base_dir)
+        
+        if existing !== nothing
+            println("="^70)
+            println("✓ SIMULATION ALREADY COMPLETED")
+            println("="^70)
+            println("  Run ID: $(existing["run_id"])")
+            println("  Path:   $(existing["run_dir"])")
+            println("")
+            println("  To force re-run, use: force_rerun=true")
+            println("="^70)
+            
+            return nothing, existing["run_id"], existing["run_dir"]
+        end
+        
+        println("  No completed run found. Proceeding with simulation...")
+    else
+        println("  force_rerun=true. Skipping deduplication check...")
+    end
     
     # ════════════════════════════════════════════════════════════════════════
     # DATABASE SETUP (NEW!)
