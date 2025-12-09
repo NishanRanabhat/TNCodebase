@@ -1,0 +1,10 @@
+{
+  "system": {"type": "spin", "N": 20},
+  "model": {"name": "custom_spin","params": {"N": 20,"d": 2,"dtype": "Float64",
+            "channels": [{"type": "PowerLawCoupling","op1": "Z","op2": "Z","strength": 1.0,"alpha": 1.5,"n_exp": 8,"N": 20},
+                         {"type": "Field","op": "X","strength": 0.5}]}},
+  "state": {"type": "prebuilt","name": "domain","params": {"spin_direction": "Z","start_index": 8,"domain_size": 4,"base_state": 1,"flip_state": 2}},
+  "algorithm": {"type": "tdvp","solver": {"type": "krylov_exponential", "krylov_dim": 14, "tol": 1e-8, "evol_type": "real"},
+                "options": {"dt": 0.02, "chi_max": 60, "cutoff": 1e-8, "local_dim": 2},
+                "run": {"n_sweeps": 200}}
+}
