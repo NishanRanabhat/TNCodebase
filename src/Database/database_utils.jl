@@ -508,6 +508,46 @@ function _config_already_run(config::Dict, base_dir::String="data")
     return !isempty(_find_runs_by_config(config, base_dir))
 end
 
+"""
+    _get_completed_run(config::Dict; base_dir::String="data") -> Union{Dict, Nothing}
+
+Check if a COMPLETED simulation exists for the given config.
+
+Returns the run info dict if found, nothing otherwise.
+Only returns runs with status="completed" in metadata.
+"""
+function _get_completed_run(config::Dict; base_dir::String="data")
+    # Find all runs matching this config's hash
+    runs = _find_runs_by_config(config, base_dir)
+    
+    if isempty(runs)
+        return nothing
+    end
+    
+    # Check each run's metadata for completion status
+    for run in runs
+        run_dir = run["run_dir"]
+        metadata_path = joinpath(run_dir, "metadata.json")
+        
+        # Skip if metadata doesn't exist
+        if !isfile(metadata_path)
+            continue
+        end
+        
+        try
+            metadata = JSON.parsefile(metadata_path)
+            if get(metadata, "status", "") == "completed"
+                return run  # Found a completed run
+            end
+        catch e
+            @warn "Could not read metadata for run $(run["run_id"]): $e"
+            continue
+        end
+    end
+    
+    return nothing  # No completed run found
+end
+
 function _get_latest_run_for_config(config::Dict; base_dir::String="data")
     runs = _find_runs_by_config(config, base_dir)
     
