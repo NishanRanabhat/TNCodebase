@@ -33,7 +33,6 @@ println("  Type: $(config["system"]["type"])")
 println("  Size: N = $(config["system"]["N"])")
 
 println("\nMODEL: $(config["model"]["name"])")
-println("  Description: $(config["model"]["params"]["description"])")
 println("  dtype: $(config["model"]["params"]["dtype"])")
 
 println("\n  CHANNELS:")
