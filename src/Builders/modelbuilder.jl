@@ -141,25 +141,29 @@ Parse spin-boson channels from config
 function _parse_spinboson_channels(channels_config)
     channels = Boson[]
     
-    for ch in channels_config
-        if ch["type"] == "SpinBosonInteraction"
-            # Recursively parse spin sub-channels
+    # 1. Spin channels → auto-wrap with Ib
+    if haskey(channels_config, "spin_channels")
+        for ch in _parse_spin_channels(channels_config["spin_channels"])
+            push!(channels, SpinBosonInteraction([ch], :Ib, 1.0))
+        end
+    end
+    
+    # 2. Boson channels
+    if haskey(channels_config, "boson_channels")
+        for ch in channels_config["boson_channels"]
+            push!(channels, BosonOnly(Symbol(ch["op"]), ch["strength"]))
+        end
+    end
+    
+    # 3. Spinboson coupling channels
+    if haskey(channels_config, "spinboson_channels")
+        for ch in channels_config["spinboson_channels"]
             spin_subchannels = _parse_spin_channels(ch["spin_channels"])
-            
             push!(channels, SpinBosonInteraction(
                 spin_subchannels,
                 Symbol(ch["boson_op"]),
                 ch["strength"]
             ))
-            
-        elseif ch["type"] == "BosonOnly"
-            push!(channels, BosonOnly(
-                Symbol(ch["op"]),
-                ch["strength"]
-            ))
-            
-        else
-            error("Unknown spin-boson channel type: $(ch["type"])")
         end
     end
     
