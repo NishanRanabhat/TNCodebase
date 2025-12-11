@@ -84,22 +84,46 @@ println("  Number of spins:   N = $N_spins")
 println("  Boson cutoff:      nmax = $nmax")
 println("  Total sites:       $(N_spins + 1) (1 boson + $N_spins spins)")
 
-println("\nChannels (4 total):")
-for (i, ch) in enumerate(channels)
-    println("  $i. $(ch["type"])")
+# Count channels
+n_spin = length(get(channels, "spin_channels", []))
+n_boson = length(get(channels, "boson_channels", []))
+n_spinboson = length(get(channels, "spinboson_channels", []))
+n_total = n_spin + n_boson + n_spinboson
+
+println("\nChannels ($n_total total):")
+
+println("  Spin channels ($n_spin):")
+for (i, ch) in enumerate(get(channels, "spin_channels", []))
+    println("    $i. $(ch["type"])")
     if haskey(ch, "description")
-        println("     → $(ch["description"])")
+        println("       → $(ch["description"])")
+    end
+end
+
+println("  Boson channels ($n_boson):")
+for (i, ch) in enumerate(get(channels, "boson_channels", []))
+    println("    $i. BosonOnly (op: $(ch["op"]))")
+    if haskey(ch, "description")
+        println("       → $(ch["description"])")
+    end
+end
+
+println("  SpinBoson channels ($n_spinboson):")
+for (i, ch) in enumerate(get(channels, "spinboson_channels", []))
+    println("    $i. SpinBosonInteraction (boson_op: $(ch["boson_op"]))")
+    if haskey(ch, "description")
+        println("       → $(ch["description"])")
     end
 end
 
 # Extract parameters
-pl_channel = channels[1]["spin_channels"][1]  # PowerLawCoupling
+pl_channel = channels["spin_channels"][1]  # PowerLawCoupling
 α = pl_channel["alpha"]
 J = pl_channel["strength"]
 n_exp = pl_channel["n_exp"]
 
-g = channels[2]["strength"]  # Tavis-Cummings coupling
-ω = channels[4]["strength"]  # Boson frequency
+g = channels["spinboson_channels"][1]["strength"]  # TC coupling
+ω = channels["boson_channels"][1]["strength"]      # Boson frequency
 
 println("\nPhysical parameters:")
 println("  Ising coupling:     J = $J")
@@ -118,26 +142,21 @@ println("="^70)
 
 println("\nThis demonstrates how each physical term becomes an MPO channel:")
 
-println("\n1️⃣  LONG-RANGE ISING (PowerLawCoupling):")
-println("    Physics: J Σᵢ<ⱼ σᶻᵢσᶻⱼ/|i-j|^α")
+println("\n1️⃣  SPIN CHANNELS (auto-wrapped with boson identity):")
+println("    Long-Range Ising: J Σᵢ<ⱼ σᶻᵢσᶻⱼ/|i-j|^α")
 println("    Method:  Sum-of-exponentials decomposition")
 println("    Result:  FSM with K=$n_exp states")
 println("    Efficiency: Bond dim O(K) instead of O(N)")
 
-println("\n2️⃣  TAVIS-CUMMINGS ABSORPTION (SpinBosonInteraction):")
-println("    Physics: g a Σᵢ σ⁺ᵢ")
-println("    Channel: Field(Sp) ⊗ a")
-println("    Meaning: Photon absorbed → spin raised")
-
-println("\n3️⃣  TAVIS-CUMMINGS EMISSION (SpinBosonInteraction):")
-println("    Physics: g a† Σᵢ σ⁻ᵢ")
-println("    Channel: Field(Sm) ⊗ a†")
-println("    Meaning: Photon emitted → spin lowered")
-
-println("\n4️⃣  BOSON ENERGY (BosonOnly):")
-println("    Physics: ω b†b")
+println("\n2️⃣  BOSON CHANNELS:")
+println("    Boson Energy: ω b†b")
 println("    Channel: Diagonal on boson site")
 println("    Meaning: Photon/phonon frequency")
+
+println("\n3️⃣  SPINBOSON CHANNELS (explicit coupling):")
+println("    Absorption: g a Σᵢ σ⁺ᵢ")
+println("    Emission:   g a† Σᵢ σ⁻ᵢ")
+println("    Meaning: Photon absorbed/emitted ↔ spin raised/lowered")
 
 println("\n" * "─"^70)
 println("Building complete MPO from all channels...")

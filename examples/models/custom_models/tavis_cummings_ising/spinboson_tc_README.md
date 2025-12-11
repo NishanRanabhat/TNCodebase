@@ -181,111 +181,55 @@ This is conserved by H_TC!
 
 ### Overview
 
-This model is built from **4 channels**:
+This model uses the **three-category channel structure**:
 
 ```json
-"channels": [
-  1. SpinBosonInteraction (long-range Ising)
-  2. SpinBosonInteraction (TC absorption)
-  3. SpinBosonInteraction (TC emission)
-  4. BosonOnly (boson energy)
+"channels": {
+  "spin_channels": [...],      // Auto-wrapped with boson identity
+  "boson_channels": [...],     // Pure boson terms
+  "spinboson_channels": [...]  // Explicit spin-boson coupling
+}
+```
+
+### Spin Channels: Long-Range Ising
+
+```json
+"spin_channels": [
+  {
+    "type": "PowerLawCoupling",
+    "op1": "Z",
+    "op2": "Z",
+    "strength": 1.0,
+    "alpha": 1.5,
+    "n_exp": 10,
+    "N": 20
+  },
+  {
+    "type": "Field",
+    "op": "Z",
+    "strength": 0.0
+  }
 ]
 ```
 
-### Channel 1: Long-Range Ising
-
-```json
-{
-  "type": "SpinBosonInteraction",
-  "spin_channels": [
-    {
-      "type": "PowerLawCoupling",
-      "op1": "Z", "op2": "Z",
-      "strength": 1.0,
-      "alpha": 1.5,
-      "n_exp": 10,
-      "N": 20
-    }
-  ],
-  "boson_op": "Ib",
-  "strength": 1.0
-}
-```
-
 **What this does:**
-- Creates PowerLawCoupling on spin sites
-- Boson site has identity operator (no effect on boson)
+- Power-law Ising interaction between spins
+- Parser auto-wraps with boson identity (Ib)
 - Uses FSM decomposition: 1/r^α ≈ Σₖ νₖλₖʳ
 - Bond dimension: O(K) = O(10) instead of O(N) = O(20)
 
-**Physical term:** J Σᵢ<ⱼ σᶻᵢσᶻⱼ/|i-j|^1.5 ⊗ I_boson
+**Physical term:** J Σᵢ<ⱼ σᶻᵢσᶻⱼ/|i-j|^1.5
 
-### Channel 2: Tavis-Cummings Absorption
-
-```json
-{
-  "type": "SpinBosonInteraction",
-  "spin_channels": [
-    {
-      "type": "Field",
-      "op": "Sp",
-      "strength": 1.0
-    }
-  ],
-  "boson_op": "a",
-  "strength": 0.2
-}
-```
-
-**What this does:**
-- Creates Field(Sp) on each spin site: Σᵢ σ⁺ᵢ
-- Couples to boson annihilation operator: a
-- Combined: a ⊗ (Σᵢ σ⁺ᵢ)
-
-**Physical term:** g a Σᵢ σ⁺ᵢ
-
-**Physical process:**
-1. Photon destroyed (a)
-2. Spin raised (σ⁺)
-3. Energy conserved
-
-### Channel 3: Tavis-Cummings Emission
+### Boson Channels: Cavity Energy
 
 ```json
-{
-  "type": "SpinBosonInteraction",
-  "spin_channels": [
-    {
-      "type": "Field",
-      "op": "Sm",
-      "strength": 1.0
-    }
-  ],
-  "boson_op": "adag",
-  "strength": 0.2
-}
-```
-
-**What this does:**
-- Creates Field(Sm) on each spin site: Σᵢ σ⁻ᵢ
-- Couples to boson creation operator: a†
-- Combined: a† ⊗ (Σᵢ σ⁻ᵢ)
-
-**Physical term:** g a† Σᵢ σ⁻ᵢ
-
-**Physical process:**
-1. Photon created (a†)
-2. Spin lowered (σ⁻)
-3. Energy conserved
-
-### Channel 4: Boson Energy
-
-```json
-{
-  "type": "BosonOnly",
-  "op": "Bn",
-  "strength": 1.0
-}
+"boson_channels": [
+  {
+    "type": "BosonOnly",
+    "op": "Bn",
+    "strength": 1.0
+  }
+]
 ```
 
 **What this does:**
@@ -293,26 +237,67 @@ This model is built from **4 channels**:
 - Bn = b†b (number operator)
 - Diagonal in Fock basis
 
-**Physical term:** ω b†b ⊗ I_spins
+**Physical term:** ω b†b
 
-**Effect:** Energy cost for photons/phonons
+### SpinBoson Channels: Tavis-Cummings Coupling
+
+```json
+"spinboson_channels": [
+  {
+    "spin_channels": [
+      {"type": "Field", "op": "Sp", "strength": 1.0}
+    ],
+    "boson_op": "a",
+    "strength": 0.2
+  },
+  {
+    "spin_channels": [
+      {"type": "Field", "op": "Sm", "strength": 1.0}
+    ],
+    "boson_op": "adag",
+    "strength": 0.2
+  }
+]
+```
+
+**What this does:**
+- First channel: g a Σᵢ σ⁺ᵢ (absorption)
+- Second channel: g a† Σᵢ σ⁻ᵢ (emission)
+- Explicit spin-boson coupling
+
+**Physical term:** g(a Σᵢ σ⁺ᵢ + a† Σᵢ σ⁻ᵢ)
+
+**Physical processes:**
+- Absorption: Photon destroyed (a) + Spin raised (σ⁺)
+- Emission: Photon created (a†) + Spin lowered (σ⁻)
 
 ---
 
 ## Configuration
 
-### Complete Config
+### Complete Config Structure
 
-See `model_config.json` for the full configuration. Key parameters:
-
-**System:**
 ```json
-"system": {
-  "type": "spinboson",
-  "N_spins": 20,
-  "nmax": 5
+{
+  "model": {
+    "name": "custom_spinboson",
+    "params": {
+      "N_spins": 20,
+      "nmax": 5,
+      "dtype": "Float64",
+      "channels": {
+        "spin_channels": [...],
+        "boson_channels": [...],
+        "spinboson_channels": [...]
+      }
+    }
+  }
 }
 ```
+
+See `spinboson_tc_model_config.json` for the full configuration.
+
+**System:**
 - 1 boson site (truncated at 5 photons)
 - 20 spin-1/2 sites
 - Total Hilbert space: 6 × 2²⁰ ≈ 6 million states
@@ -349,17 +334,22 @@ Index:    1      2       3           N+1
 - Spin sites follow
 - MPO tensors respect this ordering
 
-### Channel Types
+### Channel Categories
 
-**SpinBosonInteraction:**
-- Has spin channels (act on spin sites)
-- Has boson operator (acts on boson site)
-- Combines: boson_op ⊗ (spin channels)
+**spin_channels:**
+- Pure spin interactions (Ising, Heisenberg, fields)
+- Parser auto-wraps with boson identity
+- User doesn't need to know about Ib
 
-**BosonOnly:**
-- Acts only on boson site
+**boson_channels:**
+- Pure boson terms (energy, nonlinearity)
+- BosonOnly type
 - Spins have identity operator
-- For pure boson terms (energy, interactions)
+
+**spinboson_channels:**
+- Explicit spin-boson coupling
+- Contains nested spin_channels
+- Specifies boson_op and coupling strength
 
 ### Operators
 
@@ -380,7 +370,7 @@ Index:    1      2       3           N+1
 **Key insight:** FSM decomposition works on spin sites only
 - Boson site not involved in power-law
 - PowerLawCoupling creates FSM for spins
-- Boson has identity (no effect)
+- Boson has identity (auto-wrapped)
 - Total MPO combines both
 
 **Result:**
@@ -395,7 +385,7 @@ Index:    1      2       3           N+1
 ✅ **Heterogeneous sites** - Boson + spins in one system  
 ✅ **Long-range interactions** - FSM works for spin-boson!  
 ✅ **Correct Tavis-Cummings** - Sp/Sm operators, excitation conservation  
-✅ **Channel flexibility** - Build any spin-boson model  
+✅ **Clean channel structure** - spin/boson/spinboson categories  
 ✅ **Physical relevance** - Cavity QED, trapped ions, circuit QED  
 ✅ **Advanced physics** - Dicke superradiance, long-range order
 
@@ -403,6 +393,7 @@ Index:    1      2       3           N+1
 - FSM decomposition extends to heterogeneous systems
 - Bond dimension stays manageable (χ~14 vs χ~N)
 - Complete control via custom channels
+- Clean separation: user writes physics, parser handles implementation
 
 **Physical systems modeled:**
 - Trapped ion arrays
