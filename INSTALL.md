@@ -56,27 +56,21 @@ using TNCodebase
 
 ---
 
-## Usage Example
+### Alternative: One-Command Setup
 
-```julia
-using JSON
-using TNCodebase
+Alternatively, you can run the setup script from your terminal instead of using the Julia REPL:
 
-# Load a configuration
-config = JSON.parsefile("examples/00_quickstart_dmrg/dmrg_config.json")
-
-# Run simulation
-state, run_id, run_dir = run_simulation_from_config(config, base_dir="data")
-
-# Load results
-latest = get_latest_run_for_config(config, base_dir="data")
-mps, extra_data = load_mps_sweep(latest["run_dir"], 50)
-
-println("Loaded MPS with $(length(mps.tensors)) sites")
+```bash
+bash setup.sh
 ```
 
----
+This script performs all the steps above (activate, instantiate, and test) automatically.
 
+For HPC clusters with SLURM, submit it as a job instead:
+
+```bash
+sbatch setup.sh
+```
 ---
 
 ## For full worked out examples explore
@@ -91,6 +85,7 @@ println("Loaded MPS with $(length(mps.tensors)) sites")
 TNCodebase/
 ├── Project.toml         # ✓ Dependencies
 ├── Manifest.toml        # ✓ Created after Pkg.instantiate()
+├── setup.sh             # ✓ Setup script
 ├── src/
 │   └── TNCodebase.jl    # Main module
 ├── examples/            # Working examples
@@ -135,22 +130,6 @@ using TNCodebase
 # Now changes to source files are reflected immediately!
 ```
 
----
-
-## Running Examples
-
-After installation, navigate to an example directory:
-
-```bash
-cd examples/00_quickstart_dmrg
-julia dmrg_run.jl
-```
-
-Or from Julia REPL:
-
-```julia
-include("examples/00_quickstart_dmrg/dmrg_run.jl")
-```
 
 ## System Requirements
 
@@ -158,8 +137,6 @@ include("examples/00_quickstart_dmrg/dmrg_run.jl")
 - **RAM**: Minimum 4GB (16GB+ recommended for large systems)
 - **Disk**: ~500MB for package + dependencies
 - **OS**: Linux, macOS, or Windows (Linux recommended for best performance)
-
----
 
 ## Performance Tips
 
